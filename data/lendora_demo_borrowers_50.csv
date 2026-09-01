@@ -1,0 +1,51 @@
+borrowerId,fullName,age,city,province,occupation,employmentType,monthlyIncomePKR,monthlyExpensesPKR,existingDebtPKR,requestedLoanAmountPKR,loanTermMonths,monthlyEasypaisaTxCount,monthlyJazzCashTxCount,monthlyMobileRechargePKR,utilityBillOnTimeRate,monthlyUtilityBillPKR,previousLoansCount,previousDefaultsCount,onTimeRepaymentRate,avgPreviousLoanAmountPKR,repaymentHistoryGrade,creditHistoryYears,hasBankAccount,hasFormalCreditHistory,mockCreditworthinessScore,mockDefaultRisk,mockRiskLevel
+LND-2026-001,Ayesha Khan,22,Lahore,Punjab,Textile Retailer,Small Business Owner,80000,42000,40000,250000,9,13,50,2100,92,5500,4,1,67,50000,Poor,0,Yes,No,80,Low,Low
+LND-2026-002,Bilal Ahmed,26,Karachi,Sindh,Small Merchant,Small Business Owner,105000,74000,110000,440000,18,19,31,3600,58,7000,5,1,86,130000,Fair,0,Yes,Limited,54,Moderate-High,Moderate-High
+LND-2026-003,Usman Ali,33,Rawalpindi,Punjab,Freelancer,Freelancer,165000,89000,110000,480000,12,56,5,5400,92,6000,3,0,83,250000,Fair,1,Yes,Yes,84,Low,Low
+LND-2026-004,Sana Bibi,38,Faisalabad,Punjab,Home-Based Business Owner,Self-employed,65000,34000,15000,280000,6,59,17,2100,82,8500,3,2,88,100000,Poor,0,Yes,No,90,Low,Low
+LND-2026-005,Imran Shah,23,Peshawar,Khyber Pakhtunkhwa,Construction Worker,Daily Wage Worker,65000,44000,10000,440000,9,15,32,4800,75,14500,5,2,79,150000,Poor,3,Yes,Yes,62,Moderate,Moderate
+LND-2026-006,Hassan Raza,55,Multan,Punjab,Tailor,Self-employed,145000,90000,20000,230000,24,50,23,3000,99,12000,3,2,94,90000,Poor,0,Yes,No,83,Low,Low
+LND-2026-007,Fatima Noor,25,Islamabad,Islamabad Capital Territory,Mobile Accessories Seller,Small Business Owner,125000,89000,65000,470000,18,28,17,2400,90,12000,0,0,78,0,No previous borrowing history,0,No,No,75,Low-Moderate,Low-Moderate
+LND-2026-008,Zain Malik,21,Gujranwala,Punjab,Motorcycle Mechanic,Self-employed,165000,102000,145000,430000,12,40,3,2100,92,8500,5,1,72,140000,Poor,1,Yes,Yes,77,Low-Moderate,Low-Moderate
+LND-2026-009,Rabia Iqbal,54,Sialkot,Punjab,Grocery Store Owner,Small Business Owner,125000,96000,120000,210000,24,11,43,3900,98,12500,4,0,74,160000,Poor,3,Yes,Yes,82,Low,Low
+LND-2026-010,Hamza Tariq,29,Hyderabad,Sindh,Ride-Hailing Driver,Informal Worker,45000,30000,35000,110000,6,28,22,3300,61,8000,4,0,70,200000,Poor,3,Yes,Yes,82,Low,Low
+LND-2026-011,Nadia Hussain,54,Quetta,Balochistan,Online Seller,Self-employed,85000,58000,85000,200000,12,38,41,5100,71,13000,5,2,77,140000,Poor,1,No,Limited,76,Low-Moderate,Low-Moderate
+LND-2026-012,Farhan Sheikh,42,Bahawalpur,Punjab,Electrician,Informal Worker,185000,102000,70000,140000,12,6,40,6300,72,13500,1,0,69,250000,Poor,0,Yes,No,50,Moderate-High,Moderate-High
+LND-2026-013,Mariam Akhtar,48,Sargodha,Punjab,Textile Retailer,Small Business Owner,65000,42000,20000,410000,9,39,11,5700,73,12000,3,0,71,80000,Poor,2,Yes,Yes,70,Low-Moderate,Low-Moderate
+LND-2026-014,Waqas Butt,50,Abbottabad,Khyber Pakhtunkhwa,Small Merchant,Small Business Owner,175000,112000,15000,160000,6,30,49,4200,64,8000,1,0,99,190000,Excellent,0,Yes,No,65,Moderate,Moderate
+LND-2026-015,Sadia Javed,24,Lahore,Punjab,Freelancer,Freelancer,120000,89000,10000,380000,24,11,6,6300,58,5500,1,0,91,200000,Good,1,Yes,Yes,73,Low-Moderate,Low-Moderate
+LND-2026-016,Asad Mehmood,24,Karachi,Sindh,Home-Based Business Owner,Self-employed,95000,58000,60000,260000,18,23,30,6300,89,6500,1,1,78,60000,Fair,1,No,No,68,Moderate,Moderate
+LND-2026-017,Hina Yousaf,23,Rawalpindi,Punjab,Construction Worker,Daily Wage Worker,60000,40000,40000,430000,9,8,35,1800,69,5500,4,0,80,170000,Fair,0,No,No,85,Low,Low
+LND-2026-018,Omar Farooq,27,Faisalabad,Punjab,Tailor,Self-employed,70000,44000,50000,260000,9,47,48,4200,73,8500,3,0,84,190000,Fair,0,Yes,No,77,Low-Moderate,Low-Moderate
+LND-2026-019,Kiran Abbas,40,Peshawar,Khyber Pakhtunkhwa,Mobile Accessories Seller,Small Business Owner,65000,42000,40000,260000,9,27,7,3300,81,9000,1,1,99,140000,Fair,1,No,No,90,Low,Low
+LND-2026-020,Saif Ullah,52,Multan,Punjab,Motorcycle Mechanic,Self-employed,75000,57000,20000,260000,6,11,50,6300,67,8500,2,2,78,150000,Poor,0,No,Limited,80,Low,Low
+LND-2026-021,Naveed Iqbal,48,Islamabad,Islamabad Capital Territory,Grocery Store Owner,Small Business Owner,125000,94000,135000,130000,6,45,30,3600,60,4500,2,0,81,100000,Fair,2,Yes,Yes,83,Low,Low
+LND-2026-022,Amna Khalid,34,Gujranwala,Punjab,Ride-Hailing Driver,Informal Worker,45000,24000,10000,440000,6,58,26,6300,67,11000,1,0,84,160000,Fair,3,Yes,Yes,70,Low-Moderate,Low-Moderate
+LND-2026-023,Adnan Rauf,36,Sialkot,Punjab,Online Seller,Self-employed,120000,83000,55000,450000,18,44,50,2400,73,7000,1,1,66,100000,Poor,2,Yes,Yes,74,Low-Moderate,Low-Moderate
+LND-2026-024,Shazia Parveen,42,Hyderabad,Sindh,Electrician,Informal Worker,130000,72000,110000,160000,18,60,5,5700,72,7500,3,1,84,120000,Fair,0,Yes,No,73,Low-Moderate,Low-Moderate
+LND-2026-025,Danish Ahmed,27,Quetta,Balochistan,Textile Retailer,Small Business Owner,130000,96000,120000,270000,12,46,35,4800,92,9500,0,0,83,0,No previous borrowing history,0,No,Limited,50,Moderate-High,Moderate-High
+LND-2026-026,Mehwish Tariq,48,Bahawalpur,Punjab,Small Merchant,Small Business Owner,180000,109000,100000,370000,24,37,10,4800,94,7500,2,0,92,50000,Good,1,No,No,71,Low-Moderate,Low-Moderate
+LND-2026-027,Kamran Ali,29,Sargodha,Punjab,Freelancer,Freelancer,65000,49000,70000,310000,24,25,45,2100,77,12500,2,2,91,150000,Poor,1,No,Limited,83,Low,Low
+LND-2026-028,Iqra Bano,49,Abbottabad,Khyber Pakhtunkhwa,Home-Based Business Owner,Self-employed,105000,66000,60000,210000,24,41,22,4800,93,4500,2,1,78,180000,Fair,3,No,Limited,77,Low-Moderate,Low-Moderate
+LND-2026-029,Rizwan Haider,35,Lahore,Punjab,Construction Worker,Daily Wage Worker,185000,128000,160000,400000,9,47,8,3900,90,15000,5,2,86,70000,Poor,3,Yes,Yes,67,Moderate,Moderate
+LND-2026-030,Bushra Aslam,21,Karachi,Sindh,Tailor,Self-employed,105000,58000,5000,250000,18,44,7,5400,84,14500,4,0,89,200000,Good,1,Yes,Yes,57,Moderate-High,Moderate-High
+LND-2026-031,Talha Javed,53,Rawalpindi,Punjab,Mobile Accessories Seller,Small Business Owner,75000,54000,35000,210000,24,34,6,6300,73,6000,3,0,94,210000,Good,1,No,Limited,76,Low-Moderate,Low-Moderate
+LND-2026-032,Nimra Zahid,49,Faisalabad,Punjab,Motorcycle Mechanic,Self-employed,180000,132000,175000,380000,9,52,33,5400,74,8000,5,1,98,200000,Fair,2,Yes,Yes,65,Moderate,Moderate
+LND-2026-033,Faisal Khan,55,Peshawar,Khyber Pakhtunkhwa,Grocery Store Owner,Small Business Owner,65000,45000,15000,270000,12,25,37,1800,66,6500,1,1,74,110000,Poor,0,Yes,Limited,69,Moderate,Moderate
+LND-2026-034,Saira Mahmood,55,Multan,Punjab,Ride-Hailing Driver,Informal Worker,190000,119000,65000,360000,18,54,40,1200,94,10500,3,0,87,140000,Fair,3,Yes,Yes,74,Low-Moderate,Low-Moderate
+LND-2026-035,Arslan Qureshi,48,Islamabad,Islamabad Capital Territory,Online Seller,Self-employed,115000,74000,40000,370000,18,6,27,4200,83,7000,3,0,99,50000,Excellent,1,No,No,53,Moderate-High,Moderate-High
+LND-2026-036,Lubna Riaz,55,Gujranwala,Punjab,Electrician,Informal Worker,85000,63000,25000,130000,12,29,23,3000,87,9500,2,1,82,180000,Fair,0,Yes,Limited,49,High,High
+LND-2026-037,Tahir Hussain,34,Sialkot,Punjab,Textile Retailer,Small Business Owner,60000,46000,25000,240000,6,54,44,1500,59,8000,1,0,74,120000,Poor,0,Yes,No,84,Low,Low
+LND-2026-038,Komal Shah,33,Hyderabad,Sindh,Small Merchant,Small Business Owner,190000,133000,115000,200000,24,43,50,2100,68,9000,0,0,84,0,No previous borrowing history,1,No,Limited,73,Low-Moderate,Low-Moderate
+LND-2026-039,Yasir Mehmood,53,Quetta,Balochistan,Freelancer,Freelancer,65000,43000,65000,500000,9,11,47,3900,96,6000,4,0,87,220000,Fair,1,No,Limited,52,Moderate-High,Moderate-High
+LND-2026-040,Areeba Khan,38,Bahawalpur,Punjab,Home-Based Business Owner,Self-employed,150000,78000,130000,410000,6,32,26,5400,67,11000,1,1,99,200000,Fair,1,Yes,Yes,85,Low,Low
+LND-2026-041,Shahid Ali,38,Sargodha,Punjab,Construction Worker,Daily Wage Worker,145000,107000,25000,270000,18,20,32,4800,79,4500,3,1,76,200000,Fair,0,Yes,Limited,69,Moderate,Moderate
+LND-2026-042,Maha Raza,39,Abbottabad,Khyber Pakhtunkhwa,Tailor,Self-employed,130000,86000,80000,220000,6,20,49,5100,89,13000,1,1,96,190000,Fair,3,Yes,Yes,53,Moderate-High,Moderate-High
+LND-2026-043,Junaid Akram,40,Lahore,Punjab,Mobile Accessories Seller,Small Business Owner,115000,71000,35000,290000,24,28,33,6300,91,10000,3,2,86,160000,Poor,2,Yes,Yes,65,Moderate,Moderate
+LND-2026-044,Saima Noor,33,Karachi,Sindh,Motorcycle Mechanic,Self-employed,125000,72000,115000,220000,12,12,50,6300,69,7500,1,1,82,230000,Fair,3,No,Limited,54,Moderate-High,Moderate-High
+LND-2026-045,Noman Tariq,21,Rawalpindi,Punjab,Grocery Store Owner,Small Business Owner,135000,78000,25000,290000,6,50,37,2400,75,5000,0,0,97,0,No previous borrowing history,0,No,Limited,54,Moderate-High,Moderate-High
+LND-2026-046,Sohail Ahmed,30,Faisalabad,Punjab,Ride-Hailing Driver,Informal Worker,135000,86000,70000,310000,9,8,19,5700,65,5500,3,1,69,230000,Poor,2,No,No,57,Moderate-High,Moderate-High
+LND-2026-047,Anum Iqbal,24,Peshawar,Khyber Pakhtunkhwa,Online Seller,Self-employed,140000,75000,35000,170000,24,53,29,3300,91,10500,3,1,84,230000,Fair,1,Yes,Yes,84,Low,Low
+LND-2026-048,Rashid Khan,51,Multan,Punjab,Electrician,Informal Worker,75000,57000,30000,500000,9,21,45,1800,68,8000,1,0,75,50000,Fair,1,Yes,Yes,86,Low,Low
+LND-2026-049,Hafsa Younis,30,Islamabad,Islamabad Capital Territory,Textile Retailer,Small Business Owner,135000,71000,45000,280000,18,9,46,3300,74,14500,4,2,77,180000,Poor,0,No,No,89,Low,Low
+LND-2026-050,Muneeb Raza,26,Gujranwala,Punjab,Small Merchant,Small Business Owner,130000,95000,10000,130000,9,55,22,3900,86,6000,3,2,84,170000,Poor,0,No,Limited,76,Low-Moderate,Low-Moderate

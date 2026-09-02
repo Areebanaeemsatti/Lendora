@@ -1,10 +1,21 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any, Union
 from pydantic import BaseModel, Field, ConfigDict
+
+
+class SupportingDocument(BaseModel):
+    id: Optional[str] = None
+    fileName: Optional[str] = None
+    fileSize: Optional[str] = None
+    fileType: Optional[str] = None
+    documentType: Optional[str] = None
+    description: Optional[str] = None
+    previewUrl: Optional[str] = None
 
 
 class BorrowerInput(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
+        extra="allow",
         json_schema_extra={
             "example": {
                 "borrowerId": "LND-2026-001",
@@ -38,29 +49,31 @@ class BorrowerInput(BaseModel):
 
     borrowerId: Optional[str] = Field(None, description="Unique Borrower ID (e.g. LND-2026-001)")
     fullName: Optional[str] = Field("Anonymous Borrower", description="Borrower Full Name")
-    age: int = Field(..., ge=18, le=100, description="Borrower Age in Years")
-    city: str = Field(..., description="City of Residence (e.g. Lahore, Karachi, Peshawar)")
-    province: str = Field(..., description="Province (e.g. Punjab, Sindh, KPK, Balochistan)")
-    occupation: str = Field(..., description="Occupation / Micro-business type")
-    employmentType: str = Field(..., description="Employment Classification (e.g. Self-employed, Informal Worker, Small Business Owner)")
-    monthlyIncomePKR: float = Field(..., ge=0, description="Monthly Income in PKR")
-    monthlyExpensesPKR: float = Field(..., ge=0, description="Estimated Monthly Living Expenses in PKR")
-    existingDebtPKR: float = Field(0, ge=0, description="Total Outstanding Existing Debt in PKR")
-    requestedLoanAmountPKR: float = Field(..., gt=0, description="Loan Amount Requested in PKR")
-    loanTermMonths: int = Field(..., gt=0, le=60, description="Requested Loan Duration in Months")
-    monthlyEasypaisaTxCount: int = Field(0, ge=0, description="Monthly Easypaisa Mobile Wallet Transaction Count")
-    monthlyJazzCashTxCount: int = Field(0, ge=0, description="Monthly JazzCash Mobile Wallet Transaction Count")
-    monthlyMobileRechargePKR: float = Field(0, ge=0, description="Monthly Mobile Top-up/Recharge Amount in PKR")
-    utilityBillOnTimeRate: float = Field(..., ge=0, le=100, description="On-time Utility Bill Payment Percentage (0-100)")
-    monthlyUtilityBillPKR: float = Field(0, ge=0, description="Average Monthly Utility Bill in PKR")
-    previousLoansCount: int = Field(0, ge=0, description="Number of Previous Loans Taken")
-    previousDefaultsCount: int = Field(0, ge=0, description="Number of Previous Defaulted Loans")
-    onTimeRepaymentRate: float = Field(0, ge=0, le=100, description="Historical On-Time Repayment Percentage (0-100)")
-    avgPreviousLoanAmountPKR: float = Field(0, ge=0, description="Average Amount of Previous Loans in PKR")
-    repaymentHistoryGrade: str = Field("No previous borrowing history", description="Grade (Excellent, Good, Fair, Poor, No previous borrowing history)")
-    creditHistoryYears: int = Field(0, ge=0, description="Years of Credit / Financial Activity History")
-    hasBankAccount: str = Field("No", description="Has Bank Account (Yes / No)")
-    hasFormalCreditHistory: str = Field("No", description="Has Formal Credit Bureau Record (Yes / No / Limited)")
+    age: Optional[Union[int, float]] = Field(None, description="Borrower Age in Years")
+    city: Optional[str] = Field(None, description="City of Residence (e.g. Lahore, Karachi, Peshawar)")
+    province: Optional[str] = Field(None, description="Province (e.g. Punjab, Sindh, KPK, Balochistan)")
+    occupation: Optional[str] = Field(None, description="Occupation / Micro-business type")
+    employmentType: Optional[str] = Field(None, description="Employment Classification (e.g. Self-employed, Informal Worker, Small Business Owner)")
+    monthlyIncomePKR: Optional[Union[int, float]] = Field(None, description="Monthly Income in PKR")
+    monthlyExpensesPKR: Optional[Union[int, float]] = Field(None, description="Estimated Monthly Living Expenses in PKR")
+    existingDebtPKR: Optional[Union[int, float]] = Field(0, description="Total Outstanding Existing Debt in PKR")
+    requestedLoanAmountPKR: Optional[Union[int, float]] = Field(None, description="Loan Amount Requested in PKR")
+    loanTermMonths: Optional[Union[int, float]] = Field(None, description="Requested Loan Duration in Months")
+    monthlyEasypaisaTxCount: Optional[Union[int, float]] = Field(0, description="Monthly Easypaisa Mobile Wallet Transaction Count")
+    monthlyJazzCashTxCount: Optional[Union[int, float]] = Field(0, description="Monthly JazzCash Mobile Wallet Transaction Count")
+    monthlyMobileRechargePKR: Optional[Union[int, float]] = Field(0, description="Monthly Mobile Top-up/Recharge Amount in PKR")
+    utilityBillOnTimeRate: Optional[Union[int, float]] = Field(None, description="On-time Utility Bill Payment Percentage (0-100)")
+    monthlyUtilityBillPKR: Optional[Union[int, float]] = Field(0, description="Average Monthly Utility Bill in PKR")
+    previousLoansCount: Optional[Union[int, float]] = Field(0, description="Number of Previous Loans Taken")
+    previousDefaultsCount: Optional[Union[int, float]] = Field(0, description="Number of Previous Defaulted Loans")
+    onTimeRepaymentRate: Optional[Union[int, float]] = Field(0, description="Historical On-Time Repayment Percentage (0-100)")
+    avgPreviousLoanAmountPKR: Optional[Union[int, float]] = Field(0, description="Average Amount of Previous Loans in PKR")
+    repaymentHistoryGrade: Optional[str] = Field("No previous borrowing history", description="Grade (Excellent, Good, Fair, Poor, No previous borrowing history)")
+    creditHistoryYears: Optional[Union[int, float]] = Field(0, description="Years of Credit / Financial Activity History")
+    hasBankAccount: Optional[str] = Field("No", description="Has Bank Account (Yes / No)")
+    hasFormalCreditHistory: Optional[str] = Field("No", description="Has Formal Credit Bureau Record (Yes / No / Limited)")
+    traditionalCreditNotes: Optional[str] = Field(None, description="Optional notes on credit background")
+    supportingDocuments: Optional[List[SupportingDocument]] = Field(default_factory=list, description="Uploaded proof documents")
 
 
 class FeatureImportanceItem(BaseModel):
@@ -68,6 +81,7 @@ class FeatureImportanceItem(BaseModel):
     displayName: str = Field(..., description="Human Readable Signal Label")
     impact: str = Field(..., description="Impact Direction: 'positive', 'negative', or 'neutral'")
     weight: float = Field(..., description="Calculated Relative Weight Contribution (%)")
+    shapValue: Optional[float] = Field(0.0, description="SHAP-style additive impact on credit score")
     description: str = Field(..., description="Explanation of signal impact on creditworthiness")
 
 
@@ -77,6 +91,9 @@ class FinancialMetrics(BaseModel):
     debtServiceCoverageRatio: float = Field(..., description="Debt Service Coverage Ratio (DSCR)")
     totalMonthlyWalletTx: int = Field(..., description="Combined Monthly Mobile Wallet Transactions (Easypaisa + JazzCash)")
     utilityPaymentReliability: float = Field(..., description="Utility On-time Payment Percentage")
+    transactionVelocityDaily: Optional[float] = Field(0.0, description="Average daily mobile wallet transaction velocity")
+    utilityDelayRatio: Optional[float] = Field(0.0, description="Ratio of delayed utility payments (0.0 - 1.0)")
+    walletCashBalanceProxy: Optional[float] = Field(0.0, description="Estimated wallet cash-in vs cash-out balance index")
 
 
 class ScoreBreakdown(BaseModel):
@@ -91,7 +108,7 @@ class RiskAssessmentResponse(BaseModel):
     fullName: str = Field(..., description="Borrower Full Name")
     creditScore: int = Field(..., ge=0, le=100, description="Lendora Normalized Credit Score (0 - 100)")
     scaledCreditScore: int = Field(..., ge=300, le=850, description="Scaled Standard Credit Score Equivalent (300 - 850)")
-    riskTier: str = Field(..., description="Risk Tier: 'Low', 'Low-Moderate', 'Moderate', 'Moderate-High', 'High'")
+    riskTier: str = Field(..., description="Risk Tier: 'low', 'moderate', 'elevated', or 'high'")
     defaultRiskCategory: str = Field(..., description="Risk Level Classification")
     estimatedDefaultProbability: float = Field(..., description="Estimated Probability of Default (%)")
     recommendation: str = Field(..., description="Underwriting Recommendation (Approved, Approved with Conditions, Manual Review, Rejected)")
@@ -100,7 +117,9 @@ class RiskAssessmentResponse(BaseModel):
     scoreBreakdown: ScoreBreakdown = Field(..., description="Detailed Component Sub-scores")
     topPositiveDrivers: List[str] = Field(..., description="Top Key Positive Credit Signals")
     topRiskDrivers: List[str] = Field(..., description="Top Key Risk Signals")
-    featureImportance: List[FeatureImportanceItem] = Field(..., description="Comprehensive Feature Importance Analysis")
+    featureImportance: List[FeatureImportanceItem] = Field(..., description="Comprehensive Feature Importance & SHAP Factors")
+    modelTypeUsed: Optional[str] = Field("calibrated_heuristic", description="Underlying scoring engine: 'trained_ml_model' or 'calibrated_heuristic'")
+    derivedFeatures: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Raw engineered features passed to inference engine")
 
 
 class HealthResponse(BaseModel):

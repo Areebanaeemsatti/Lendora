@@ -1,7 +1,8 @@
 from typing import List, Dict, Any
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, status
 from schemas.borrower import BorrowerInput, RiskAssessmentResponse
 from services.scoring_service import ScoringService
+from exceptions import InvalidFinancialRangeException, MissingCrucialSignalException
 
 router = APIRouter(prefix="/api/v1", tags=["Credit Assessment & Scoring"])
 
@@ -9,27 +10,26 @@ router = APIRouter(prefix="/api/v1", tags=["Credit Assessment & Scoring"])
 @router.post(
     "/score",
     response_model=RiskAssessmentResponse,
-    summary="Assess Borrower Credit Risk & Score",
+    status_code=status.HTTP_200_OK,
+    summary="Assess Borrower Credit Risk & Generate Scorecard",
     description="""
-Accepts borrower financial signals (cash flow, mobile wallet activity, utility reliability, credit history),
-runs Pydantic validation, and returns a detailed risk assessment scorecard including normalized score,
-risk tier, estimated default probability, financial ratios, and feature importance drivers.
+Processes borrower financial signals through the feature engineering pipeline
+(validating domain constraints and computing transaction velocity, utility delay ratio, and wallet liquidity balance),
+runs inference via plug-and-play ML model or calibrated heuristic fallback, and returns a comprehensive scorecard
+with 300-850 credit scores and SHAP explainability factors.
 """
 )
 async def assess_credit_score(borrower: BorrowerInput) -> RiskAssessmentResponse:
-    try:
-        assessment = ScoringService.calculate_score(borrower)
-        return assessment
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An error occurred while evaluating credit score: {str(e)}"
-        )
+    # Any InvalidFinancialRangeException or MissingCrucialSignalException
+    # will bubble to FastAPI custom exception handlers for structured 422/400 responses.
+    assessment = ScoringService.calculate_score(borrower)
+    return assessment
 
 
 @router.get(
     "/samples",
     response_model=List[Dict[str, Any]],
+    status_code=status.HTTP_200_OK,
     summary="Get Sample Borrower Profiles for Testing",
     description="""
 Reads 3 to 5 realistic borrower profiles directly from the mock CSV dataset (lendora_demo_borrowers_50.csv)
@@ -43,9 +43,9 @@ async def get_sample_borrowers(
         samples = ScoringService.get_sample_borrowers(limit=limit)
         return samples
     except FileNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch sample borrower data: {str(e)}"
         )

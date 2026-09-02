@@ -1,4 +1,5 @@
 import { BorrowerApplication } from '@/types';
+import { toApplicationStatus, type LoanStatus } from '@/lib/mockData';
 
 const STORAGE_KEY = 'lendora_borrower_applications';
 
@@ -22,6 +23,22 @@ export function saveApplicationLocally(application: BorrowerApplication): void {
 export function getApplicationById(id: string): BorrowerApplication | null {
   const applications = getAllStoredApplications();
   return applications.find((app) => app.id === id) || null;
+}
+
+export function updateStoredApplicationStatus(id: string, status: LoanStatus): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const applications = getAllStoredApplications();
+    const index = applications.findIndex((app) => app.id === id);
+    if (index < 0) return;
+    applications[index] = {
+      ...applications[index],
+      status: toApplicationStatus(status),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
+  } catch (error) {
+    console.error('Failed to update application status', error);
+  }
 }
 
 export const defaultSampleApplications: BorrowerApplication[] = [

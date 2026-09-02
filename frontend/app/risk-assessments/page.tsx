@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { BorrowerApplication } from '@/types';
-import { getApplicationById, getAllStoredApplications, defaultSampleApplications } from '@/lib/storage';
+import { getApplicationById, getAllStoredApplications } from '@/lib/storage';
 import { BorrowerOverviewCard } from '@/components/assessment/BorrowerOverviewCard';
 import { FinancialProfileCard } from '@/components/assessment/FinancialProfileCard';
 import { AlternativeSignalsCard } from '@/components/assessment/AlternativeSignalsCard';
@@ -17,32 +17,39 @@ import { ApplicationSwitcher } from '@/components/assessment/ApplicationSwitcher
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
-import { PlusCircle, FileCheck, ArrowLeft, RotateCcw } from 'lucide-react';
+import { UnderwriterDashboard } from '@/components/dashboard/UnderwriterDashboard';
+import { useApplications } from '@/components/providers/ApplicationsProvider';
+import { formatPKR } from '@/lib/utils';
+import { PlusCircle, FileCheck } from 'lucide-react';
 
 function RiskAssessmentsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedId = searchParams.get('id');
+  const { applications, updateStatus } = useApplications();
 
-  const [currentApp, setCurrentApp] = useState<BorrowerApplication | null>(defaultSampleApplications[0]);
-  const [allApplications, setAllApplications] = useState<BorrowerApplication[]>(defaultSampleApplications);
+  const [currentApp, setCurrentApp] = useState<BorrowerApplication | null>(null);
+  const [allApplications, setAllApplications] = useState<BorrowerApplication[]>([]);
 
   useEffect(() => {
     const stored = getAllStoredApplications();
     setAllApplications(stored);
 
-    if (requestedId) {
-      const found = getApplicationById(requestedId);
-      if (found) {
-        setCurrentApp(found);
-        return;
-      }
+    const targetId = requestedId ?? applications[0]?.id;
+    if (targetId) {
+      setCurrentApp(getApplicationById(targetId));
+      return;
     }
 
-    if (stored.length > 0) {
-      setCurrentApp(stored[0]);
+    setCurrentApp(null);
+  }, [requestedId, applications]);
+
+  const selectedQueueItem = useMemo(() => {
+    if (requestedId) {
+      return applications.find((app) => app.id === requestedId) ?? applications[0] ?? null;
     }
-  }, [requestedId]);
+    return applications[0] ?? null;
+  }, [applications, requestedId]);
 
   const handleSelectApplication = (id: string) => {
     router.push(`/risk-assessments?id=${id}`);
@@ -51,36 +58,35 @@ function RiskAssessmentsContent() {
   return (
     <AppLayout>
       <div className="space-y-6 max-w-7xl mx-auto pb-16">
-        {/* Top Control Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                Risk Assessment &amp; Decision Support Dashboard
+                Underwriter Dashboard
               </h2>
               <Badge variant="emerald" dot>
-                Underwriting Engine Active
+                Mock queue active
               </Badge>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Alternative financial signal evaluation for Pakistani borrowers without conventional credit records.
+              Review local loan applications, toggle Approve / Reject, and inspect alternative-signal scorecards.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link href="/new-application">
-              <Button
-                variant="primary"
-                size="sm"
-                leftIcon={<PlusCircle className="w-4 h-4" />}
-              >
-                New Application
-              </Button>
-            </Link>
-          </div>
+          <Link href="/new-application">
+            <Button variant="primary" size="sm" leftIcon={<PlusCircle className="w-4 h-4" />}>
+              New Application
+            </Button>
+          </Link>
         </div>
 
-        {/* Application Queue Switcher if multiple records exist */}
+        <UnderwriterDashboard
+          applications={applications}
+          selectedId={selectedQueueItem?.id}
+          onSelect={handleSelectApplication}
+          onUpdateStatus={updateStatus}
+        />
+
         {currentApp && (
           <ApplicationSwitcher
             applications={allApplications}
@@ -91,37 +97,39 @@ function RiskAssessmentsContent() {
 
         {currentApp ? (
           <div className="space-y-6">
-            {/* 1. Borrower Overview */}
             <BorrowerOverviewCard application={currentApp} />
-
-            {/* 6. Assessment Summary Card (Prominent Mock Scorecard Panel) */}
             <AssessmentSummaryCard />
-
-            {/* 2 & 3. Split Grid: Financial Profile & Alternative Signals */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <FinancialProfileCard application={currentApp} />
               <AlternativeSignalsCard application={currentApp} />
             </div>
-
-            {/* 4. Repayment Behavior & Credit History */}
             <RepaymentBehaviorCard application={currentApp} />
-
-            {/* 5. Supporting Documents & Image Proof */}
             <SupportingEvidenceCard application={currentApp} />
-
-            {/* 7. Decision Support & Underwriting Remarks */}
-            <DecisionSupportCard />
+            <DecisionSupportCard
+              applicationId={currentApp.id}
+              status={selectedQueueItem?.status ?? 'pending'}
+              onUpdateStatus={updateStatus}
+            />
           </div>
+        ) : selectedQueueItem ? (
+          <Card className="p-6 border-emerald-200 bg-emerald-50/40">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Selected queue record</p>
+            <h3 className="text-lg font-bold text-slate-900 mt-1">{selectedQueueItem.applicantName}</h3>
+            <p className="text-sm text-slate-600 mt-2">
+              Monthly income {formatPKR(selectedQueueItem.income)} · requested {formatPKR(selectedQueueItem.requestedAmount)} ·
+              alt score {selectedQueueItem.altCreditScore} ({selectedQueueItem.riskLevel} risk)
+            </p>
+            <p className="text-xs text-slate-500 mt-3">
+              Full scorecards appear for applications submitted through the borrower form. This seed record lives in the mock queue only.
+            </p>
+          </Card>
         ) : (
-          /* Empty State */
           <Card className="p-12 text-center">
             <div className="max-w-md mx-auto space-y-4">
               <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto">
                 <FileCheck className="w-6 h-6 text-slate-500" />
               </div>
-              <h3 className="text-base font-bold text-slate-900">
-                No Borrower Application Selected
-              </h3>
+              <h3 className="text-base font-bold text-slate-900">No Borrower Application Selected</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Submit a new borrower application or select an existing record to review alternative financial signals and risk assessment scorecards.
               </p>
@@ -140,7 +148,7 @@ function RiskAssessmentsContent() {
 
 export default function RiskAssessmentsPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading risk assessments...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading underwriter dashboard...</div>}>
       <RiskAssessmentsContent />
     </Suspense>
   );

@@ -104,3 +104,9 @@ export interface BorrowerSummary {
   riskTier?: RiskTier;
   riskScore?: number;
 }
+
+export interface ShapFeature {
+  featureName: string;
+  impact: number;
+  category: string;
+}

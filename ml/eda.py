@@ -1,7 +1,7 @@
 """
 Exploratory Data Analysis for the credit-risk training data.
 
-Run standalone (needs the same kagglehub auth as train_credit_model.py):
+Run standalone (uses the local synthetic alternative-data CSV configured in train_credit_model.py):
 
     python eda.py
 
@@ -34,10 +34,6 @@ import pandas as pd
 #   - person_emp_length has a handful of impossible values (>60 years)
 #   - loan_int_rate has real missingness (~9-10% of rows)
 #   - loan_status is imbalanced (~78% non-default / 22% default)
-SANITY_BOUNDS = {
-    "person_age": (18, 100),
-    "person_emp_length": (0, 60),
-}
 
 
 def _numeric_and_categorical_cols(df: pd.DataFrame, target_col: str | None) -> tuple[list[str], list[str]]:
@@ -90,11 +86,6 @@ def numeric_summary(df: pd.DataFrame, numeric_cols: list[str]) -> dict[str, Any]
             "iqr_outlier_pct": round(float(len(outliers) / len(s) * 100), 2),
             "iqr_bounds": [round(float(lower), 2), round(float(upper), 2)],
         }
-        if col in SANITY_BOUNDS:
-            lo, hi = SANITY_BOUNDS[col]
-            impossible = s[(s < lo) | (s > hi)]
-            summary[col]["domain_sanity_bounds"] = [lo, hi]
-            summary[col]["domain_impossible_count"] = int(len(impossible))
     return summary
 
 
@@ -244,7 +235,7 @@ def _render_markdown(report: dict[str, Any]) -> str:
 
 
 if __name__ == "__main__":
-    from train_credit_model import DATASET_NAME, TARGET_COLUMN, ARTIFACT_DIR, load_dataset
+    from train_credit_model import DATA_PATH, TARGET_COLUMN, ARTIFACT_DIR, load_dataset
 
     df = load_dataset()
     report = run_eda(df, TARGET_COLUMN, ARTIFACT_DIR / "eda")

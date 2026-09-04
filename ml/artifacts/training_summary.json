@@ -1,0 +1,82 @@
+{
+  "dataset": "pk_alt_data_synthetic3.csv",
+  "target": "default_label",
+  "dataset_type": "synthetic_alternative_financial_data",
+  "train_rows": 16000,
+  "validation_rows": 4000,
+  "best_model": "logistic_regression",
+  "decision_threshold": 0.5399999999999998,
+  "features_used": [
+    "provider",
+    "occupation",
+    "wallet_active_days_ratio_90d",
+    "wallet_txn_count_90d",
+    "wallet_txn_count_30d",
+    "wallet_days_since_last_txn",
+    "wallet_topup_count_90d",
+    "wallet_topup_avg_amount",
+    "wallet_topup_frequency_per_month",
+    "wallet_bill_payment_count_90d",
+    "wallet_bill_payment_share",
+    "wallet_distinct_billers_90d",
+    "wallet_avg_balance",
+    "wallet_inflow_outflow_ratio",
+    "wallet_txn_amount_volatility",
+    "recent_txn_activity_ratio",
+    "recent_transaction_flag",
+    "txn_recency_score",
+    "topup_to_transaction_ratio",
+    "estimated_topup_volume_log",
+    "bill_payment_txn_ratio",
+    "bill_payment_consistency",
+    "avg_balance_log",
+    "cashflow_stress_flag",
+    "txn_volatility_log",
+    "transactions_per_active_day"
+  ],
+  "feature_count": 26,
+  "scale_pos_weight": 4.9171597633136095,
+  "results": {
+    "logistic_regression": {
+      "roc_auc": 0.6939200471379032,
+      "pr_auc": 0.30519261980490253,
+      "precision": 0.28074074074074074,
+      "recall": 0.5606508875739645,
+      "f1": 0.3741362290227048,
+      "threshold": 0.5399999999999998,
+      "oof_roc_auc": 0.6795047582936364,
+      "oof_pr_auc": 0.30965525089334167
+    },
+    "random_forest": {
+      "roc_auc": 0.6696755352857824,
+      "pr_auc": 0.274706659941489,
+      "precision": 0.2546403712296984,
+      "recall": 0.6494082840236687,
+      "f1": 0.36583333333333334,
+      "threshold": 0.32999999999999985,
+      "oof_roc_auc": 0.6629720994301797,
+      "oof_pr_auc": 0.28370812803166734
+    },
+    "xgboost": {
+      "roc_auc": 0.660592855261003,
+      "pr_auc": 0.28184930186834073,
+      "precision": 0.23950617283950618,
+      "recall": 0.7174556213017751,
+      "f1": 0.35912624953720845,
+      "threshold": 0.33999999999999986,
+      "oof_roc_auc": 0.6427664157125157,
+      "oof_pr_auc": 0.2702829609894719
+    },
+    "lightgbm": {
+      "roc_auc": 0.6531519022493751,
+      "pr_auc": 0.26699018975536976,
+      "precision": 0.2206140350877193,
+      "recall": 0.7440828402366864,
+      "f1": 0.34032476319350474,
+      "threshold": 0.3199999999999999,
+      "oof_roc_auc": 0.6510487871958643,
+      "oof_pr_auc": 0.27774341187026963
+    }
+  },
+  "eda_report_path": "artifacts\\eda\\eda_report.md"
+}

@@ -1,0 +1,291 @@
+{
+  "shape": {
+    "rows": 20000,
+    "cols": 17
+  },
+  "dtypes": {
+    "borrower_id": "str",
+    "provider": "str",
+    "occupation": "str",
+    "wallet_active_days_ratio_90d": "float64",
+    "wallet_txn_count_90d": "int64",
+    "wallet_txn_count_30d": "int64",
+    "wallet_days_since_last_txn": "int64",
+    "wallet_topup_count_90d": "int64",
+    "wallet_topup_avg_amount": "float64",
+    "wallet_topup_frequency_per_month": "float64",
+    "wallet_bill_payment_count_90d": "int64",
+    "wallet_bill_payment_share": "float64",
+    "wallet_distinct_billers_90d": "int64",
+    "wallet_avg_balance": "float64",
+    "wallet_inflow_outflow_ratio": "float64",
+    "wallet_txn_amount_volatility": "float64",
+    "default_label": "int64"
+  },
+  "missing_values": {},
+  "target_balance": {
+    "counts": {
+      "0": 16620,
+      "1": 3380
+    },
+    "pct": {
+      "0": 83.1,
+      "1": 16.9
+    },
+    "imbalance_ratio": 4.92
+  },
+  "numeric_summary": {
+    "wallet_active_days_ratio_90d": {
+      "mean": 0.292,
+      "std": 0.085,
+      "min": 0.0444,
+      "25%": 0.2333,
+      "50%": 0.2889,
+      "75%": 0.3556,
+      "max": 0.5889,
+      "skew": 0.104,
+      "iqr_outlier_count": 23,
+      "iqr_outlier_pct": 0.11,
+      "iqr_bounds": [
+        0.05,
+        0.54
+      ]
+    },
+    "wallet_txn_count_90d": {
+      "mean": 31.483,
+      "std": 10.6,
+      "min": 4.0,
+      "25%": 24.0,
+      "50%": 31.0,
+      "75%": 39.0,
+      "max": 74.0,
+      "skew": 0.315,
+      "iqr_outlier_count": 71,
+      "iqr_outlier_pct": 0.36,
+      "iqr_bounds": [
+        1.5,
+        61.5
+      ]
+    },
+    "wallet_txn_count_30d": {
+      "mean": 10.498,
+      "std": 4.345,
+      "min": 0.0,
+      "25%": 7.0,
+      "50%": 10.0,
+      "75%": 13.0,
+      "max": 33.0,
+      "skew": 0.477,
+      "iqr_outlier_count": 157,
+      "iqr_outlier_pct": 0.78,
+      "iqr_bounds": [
+        -2.0,
+        22.0
+      ]
+    },
+    "wallet_days_since_last_txn": {
+      "mean": 2.574,
+      "std": 3.335,
+      "min": 0.0,
+      "25%": 0.0,
+      "50%": 2.0,
+      "75%": 4.0,
+      "max": 49.0,
+      "skew": 2.796,
+      "iqr_outlier_count": 680,
+      "iqr_outlier_pct": 3.4,
+      "iqr_bounds": [
+        -6.0,
+        10.0
+      ]
+    },
+    "wallet_topup_count_90d": {
+      "mean": 16.473,
+      "std": 7.36,
+      "min": 1.0,
+      "25%": 11.0,
+      "50%": 16.0,
+      "75%": 21.0,
+      "max": 49.0,
+      "skew": 0.556,
+      "iqr_outlier_count": 174,
+      "iqr_outlier_pct": 0.87,
+      "iqr_bounds": [
+        -4.0,
+        36.0
+      ]
+    },
+    "wallet_topup_avg_amount": {
+      "mean": 127.556,
+      "std": 34.738,
+      "min": 30.0,
+      "25%": 101.86,
+      "50%": 127.39500000000001,
+      "75%": 153.81,
+      "max": 239.84,
+      "skew": -0.032,
+      "iqr_outlier_count": 1,
+      "iqr_outlier_pct": 0.01,
+      "iqr_bounds": [
+        23.93,
+        231.74
+      ]
+    },
+    "wallet_topup_frequency_per_month": {
+      "mean": 5.491,
+      "std": 2.453,
+      "min": 0.33,
+      "25%": 3.67,
+      "50%": 5.33,
+      "75%": 7.0,
+      "max": 16.33,
+      "skew": 0.556,
+      "iqr_outlier_count": 225,
+      "iqr_outlier_pct": 1.12,
+      "iqr_bounds": [
+        -1.33,
+        12.0
+      ]
+    },
+    "wallet_bill_payment_count_90d": {
+      "mean": 3.897,
+      "std": 1.97,
+      "min": 0.0,
+      "25%": 2.0,
+      "50%": 4.0,
+      "75%": 5.0,
+      "max": 9.0,
+      "skew": 0.382,
+      "iqr_outlier_count": 0,
+      "iqr_outlier_pct": 0.0,
+      "iqr_bounds": [
+        -2.5,
+        9.5
+      ]
+    },
+    "wallet_bill_payment_share": {
+      "mean": 0.136,
+      "std": 0.081,
+      "min": 0.0,
+      "25%": 0.0769,
+      "50%": 0.1212,
+      "75%": 0.1765,
+      "max": 0.6923,
+      "skew": 1.169,
+      "iqr_outlier_count": 607,
+      "iqr_outlier_pct": 3.03,
+      "iqr_bounds": [
+        -0.07,
+        0.33
+      ]
+    },
+    "wallet_distinct_billers_90d": {
+      "mean": 1.872,
+      "std": 0.753,
+      "min": 0.0,
+      "25%": 1.0,
+      "50%": 2.0,
+      "75%": 2.0,
+      "max": 3.0,
+      "skew": -0.055,
+      "iqr_outlier_count": 0,
+      "iqr_outlier_pct": 0.0,
+      "iqr_bounds": [
+        -0.5,
+        3.5
+      ]
+    },
+    "wallet_avg_balance": {
+      "mean": -212.661,
+      "std": 461.873,
+      "min": -3262.14,
+      "25%": -482.85249999999996,
+      "50%": -189.425,
+      "75%": 78.2025,
+      "max": 2231.24,
+      "skew": -0.308,
+      "iqr_outlier_count": 494,
+      "iqr_outlier_pct": 2.47,
+      "iqr_bounds": [
+        -1324.43,
+        919.78
+      ]
+    },
+    "wallet_inflow_outflow_ratio": {
+      "mean": 0.914,
+      "std": 0.97,
+      "min": 0.0,
+      "25%": 0.443175,
+      "50%": 0.737,
+      "75%": 1.131025,
+      "max": 34.2726,
+      "skew": 9.75,
+      "iqr_outlier_count": 994,
+      "iqr_outlier_pct": 4.97,
+      "iqr_bounds": [
+        -0.59,
+        2.16
+      ]
+    },
+    "wallet_txn_amount_volatility": {
+      "mean": 1255.446,
+      "std": 314.124,
+      "min": 39.37,
+      "25%": 1029.67,
+      "50%": 1221.74,
+      "75%": 1445.86,
+      "max": 2479.17,
+      "skew": 0.452,
+      "iqr_outlier_count": 187,
+      "iqr_outlier_pct": 0.94,
+      "iqr_bounds": [
+        405.39,
+        2070.14
+      ]
+    }
+  },
+  "categorical_summary": {
+    "borrower_id": {
+      "PK000000": 1,
+      "PK000001": 1,
+      "PK000002": 1,
+      "PK000003": 1,
+      "PK000004": 1,
+      "PK000005": 1,
+      "PK000006": 1,
+      "PK000007": 1,
+      "PK000008": 1,
+      "PK000009": 1
+    },
+    "provider": {
+      "JazzCash": 5010,
+      "Easypaisa": 5005,
+      "SadaPay": 5004,
+      "NayaPay": 4981
+    },
+    "occupation": {
+      "small_shopkeeper": 3383,
+      "rickshaw_driver": 3365,
+      "delivery_rider": 3352,
+      "daily_wage_laborer": 3335,
+      "street_vendor": 3304,
+      "domestic_worker": 3261
+    }
+  },
+  "correlation_with_target": {
+    "wallet_active_days_ratio_90d": -0.172,
+    "wallet_txn_count_90d": -0.169,
+    "wallet_avg_balance": -0.167,
+    "wallet_txn_count_30d": -0.14,
+    "wallet_topup_frequency_per_month": -0.138,
+    "wallet_topup_count_90d": -0.138,
+    "wallet_topup_avg_amount": -0.121,
+    "wallet_days_since_last_txn": 0.115,
+    "wallet_inflow_outflow_ratio": -0.112,
+    "wallet_bill_payment_share": 0.07,
+    "wallet_distinct_billers_90d": -0.057,
+    "wallet_bill_payment_count_90d": -0.051,
+    "wallet_txn_amount_volatility": 0.008
+  },
+  "duplicate_rows": 0
+}

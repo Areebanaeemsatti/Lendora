@@ -109,7 +109,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](../LICE
 ---
 
 <p align="center">
-  Developed for <b>IndusAI / Hackathon 2026</b> • Empowering Pakistan's Informal Workforce
+  Developed for <b>Alibaba Hackathon 2026</b> • Empowering Pakistan's Informal Workforce
 </p>
 
    

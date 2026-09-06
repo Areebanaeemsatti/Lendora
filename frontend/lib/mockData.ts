@@ -20,126 +20,13 @@ export interface LoanApplication {
   defaultProbability?: number;
 }
 
-export const initialMockApplications: LoanApplication[] = [
-  {
-    id: 'app-001',
-    applicantName: 'Muhammad Tariq Enterprises',
-    income: 185000,
-    requestedAmount: 3500000,
-    altCreditScore: 785,
-    riskLevel: 'Low',
-    status: 'approved',
-    baseScore: 520,
-    shapFeatures: [
-      { featureName: 'High Income', impact: 90, category: 'Income' },
-      { featureName: 'Low Leverage', impact: 45, category: 'Financial' },
-      { featureName: 'On-time Utility Payments', impact: 52, category: 'Payment Behavior' },
-      { featureName: 'Excellent Repayment History', impact: 64, category: 'Credit History' },
-      { featureName: 'Digital Transaction Volume', impact: 14, category: 'Digital Activity' },
-    ],
-  },
-  {
-    id: 'app-sample-2',
-    applicantName: 'Farhan Electronics & Mobile Care',
-    income: 95000,
-    requestedAmount: 180000,
-    altCreditScore: 690,
-    riskLevel: 'Moderate',
-    status: 'pending',
-    baseScore: 520,
-    shapFeatures: [
-      { featureName: 'Moderate Income', impact: 70, category: 'Income' },
-      { featureName: 'Low Leverage', impact: 80, category: 'Financial' },
-      { featureName: 'On-time Utility Payments', impact: 38, category: 'Payment Behavior' },
-      { featureName: 'Good Repayment History', impact: 42, category: 'Credit History' },
-      { featureName: 'Short Credit History', impact: -60, category: 'Credit History' },
-    ],
-  },
-  {
-    id: 'app-sample-1',
-    applicantName: 'Rashid Mahmood Ansari',
-    income: 85000,
-    requestedAmount: 250000,
-    altCreditScore: 742,
-    riskLevel: 'Low',
-    status: 'pending',
-    baseScore: 520,
-    shapFeatures: [
-      { featureName: 'Moderate Income', impact: 70, category: 'Income' },
-      { featureName: 'Moderate Leverage', impact: 45, category: 'Financial' },
-      { featureName: 'Excellent Utility Payment Rate', impact: 52, category: 'Payment Behavior' },
-      { featureName: 'Strong Repayment History', impact: 55, category: 'Credit History' },
-      { featureName: 'Consistent Digital Activity', impact: 0, category: 'Digital Activity' },
-    ],
-  },
-  {
-    id: 'app-003',
-    applicantName: 'Noor Modern Pharmacy',
-    income: 210000,
-    requestedAmount: 2800000,
-    altCreditScore: 810,
-    riskLevel: 'Low',
-    status: 'approved',
-    baseScore: 520,
-    shapFeatures: [
-      { featureName: 'High Income', impact: 90, category: 'Income' },
-      { featureName: 'Moderate Leverage', impact: 45, category: 'Financial' },
-      { featureName: 'Perfect Utility Payment Rate', impact: 55, category: 'Payment Behavior' },
-      { featureName: 'Excellent Repayment History', impact: 70, category: 'Credit History' },
-      { featureName: 'Strong Digital Footprint', impact: 30, category: 'Digital Activity' },
-    ],
-  },
-  {
-    id: 'app-004',
-    applicantName: 'Khyber Agro Logistics',
-    income: 140000,
-    requestedAmount: 5000000,
-    altCreditScore: 610,
-    riskLevel: 'Elevated',
-    status: 'pending',
-    baseScore: 520,
-    shapFeatures: [
-      { featureName: 'Moderate Income', impact: 70, category: 'Income' },
-      { featureName: 'High Leverage', impact: -40, category: 'Financial' },
-      { featureName: 'Good Utility Payment Rate', impact: 44, category: 'Payment Behavior' },
-      { featureName: 'Limited Repayment History', impact: -25, category: 'Credit History' },
-      { featureName: 'Inconsistent Digital Activity', impact: -41, category: 'Digital Activity' },
-    ],
-  },
-  {
-    id: 'app-005',
-    applicantName: 'Apex Digital Solutions',
-    income: 320000,
-    requestedAmount: 4000000,
-    altCreditScore: 760,
-    riskLevel: 'Low',
-    status: 'approved',
-    baseScore: 520,
-    shapFeatures: [
-      { featureName: 'Very High Income', impact: 90, category: 'Income' },
-      { featureName: 'Moderate Leverage', impact: 45, category: 'Financial' },
-      { featureName: 'Perfect Utility Payment Rate', impact: 55, category: 'Payment Behavior' },
-      { featureName: 'Excellent Repayment History', impact: 50, category: 'Credit History' },
-    ],
-  },
-  {
-    id: 'app-006',
-    applicantName: 'Sana Boutique & Stitching House',
-    income: 42000,
-    requestedAmount: 320000,
-    altCreditScore: 548,
-    riskLevel: 'High',
-    status: 'rejected',
-    baseScore: 520,
-    shapFeatures: [
-      { featureName: 'Low Income', impact: 15, category: 'Income' },
-      { featureName: 'High Leverage', impact: -40, category: 'Financial' },
-      { featureName: 'Poor Utility Payment Rate', impact: -20, category: 'Payment Behavior' },
-      { featureName: 'Limited Repayment History', impact: -35, category: 'Credit History' },
-      { featureName: 'Low Digital Activity', impact: -12, category: 'Digital Activity' },
-    ],
-  },
-];
+import { REAL_CSV_APPLICATIONS } from '@/lib/dataset';
+
+/**
+ * Real borrower applications loaded from the trained ML dataset:
+ * ml/data/pk_alt_data_synthetic3.csv
+ */
+export const initialMockApplications: LoanApplication[] = REAL_CSV_APPLICATIONS;
 
 export function deriveAltCreditScore(input: {
   income: number;

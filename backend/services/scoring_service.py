@@ -94,6 +94,17 @@ class ScoringService:
             default_probability=pred["default_probability"],
             confidence_score=pred["confidence_score"],
             shap_explanations=shap_explanations_list,
+            shap_values=[
+                {
+                    "feature_name": exp.feature_name,
+                    "featureName": exp.feature_name,
+                    "raw_value": exp.raw_value,
+                    "impact": exp.impact,
+                    "direction": exp.direction,
+                    "explanation": exp.explanation,
+                }
+                for exp in shap_explanations_list
+            ],
             recommendation=pred["recommendation"],
             top_positive_drivers=top_pos,
             top_negative_drivers=top_neg,

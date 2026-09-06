@@ -1,5 +1,8 @@
 import { BorrowerApplication } from '@/types';
 import { toApplicationStatus, type LoanStatus } from '@/lib/mockData';
+import { submitCreditScoreAssessment, formatBorrowerPayload, getApiBaseUrl } from '@/lib/api';
+
+export { submitCreditScoreAssessment, formatBorrowerPayload, getApiBaseUrl };
 
 const STORAGE_KEY = 'lendora_borrower_applications';
 

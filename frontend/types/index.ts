@@ -88,6 +88,10 @@ export interface BorrowerApplication {
   hasBankAccount?: 'yes' | 'no' | '';
   hasFormalCreditHistory?: 'yes' | 'no' | '';
   traditionalCreditNotes?: string;
+
+  // Step 03 ML Integration & Live SHAP fields
+  assessment?: RiskAssessmentResponse;
+  shap_values?: ShapValueItem[];
 }
 
 export interface BorrowerSummary {
@@ -109,4 +113,44 @@ export interface ShapFeature {
   featureName: string;
   impact: number;
   category: string;
+}
+
+export interface ShapValueItem {
+  feature_name?: string;
+  featureName?: string;
+  feature?: string;
+  raw_value?: any;
+  rawValue?: any;
+  impact: number;
+  shap_value?: number;
+  shapValue?: number;
+  direction?: 'positive' | 'negative' | string;
+  explanation?: string;
+  description?: string;
+  category?: string;
+  weight?: number;
+}
+
+export interface RiskAssessmentResponse {
+  credit_score: number;
+  risk_tier: string;
+  default_probability: number;
+  confidence_score: number;
+  shap_explanations: ShapValueItem[];
+  shap_values?: ShapValueItem[];
+  recommendation: string;
+  top_positive_drivers: string[];
+  top_negative_drivers: string[];
+
+  // Backward compatible & extra fields
+  borrowerId?: string;
+  fullName?: string;
+  creditScore?: number;
+  scaledCreditScore?: number;
+  riskTier?: RiskTier;
+  defaultRiskCategory?: string;
+  estimatedDefaultProbability?: number;
+  maxApprovedLoanAmountPKR?: number;
+  featureImportance?: ShapValueItem[];
+  modelTypeUsed?: string;
 }

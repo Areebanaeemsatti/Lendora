@@ -134,6 +134,7 @@ class RiskAssessmentResponse(BaseModel):
     default_probability: float = Field(..., ge=0.0, le=1.0, description="Predicted probability of default (0.0 to 1.0)")
     confidence_score: float = Field(..., ge=0.0, le=1.0, description="Metric based on input completeness and verified proof (0.0 to 1.0)")
     shap_explanations: List[ShapExplanation] = Field(..., description="Structured list containing feature names, raw values, and directional impacts")
+    shap_values: Optional[List[Dict[str, Any]]] = Field(default_factory=list, description="Dynamic SHAP impact values for frontend explainability visualizer")
     recommendation: str = Field(..., description="Auto-generated underwriting action (e.g. Approve Micro-Loan, Manual Review, Decline)")
 
     # Top drivers

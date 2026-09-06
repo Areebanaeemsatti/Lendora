@@ -4,15 +4,19 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import {
   initialMockApplications,
   MOCK_QUEUE_STORAGE_KEY,
+  deriveRiskLevel,
   type LoanApplication,
   type LoanStatus,
 } from '@/lib/mockData';
-import { updateStoredApplicationStatus } from '@/lib/storage';
+import { updateStoredApplicationStatus, saveApplicationLocally } from '@/lib/storage';
+import { submitCreditScoreAssessment } from '@/lib/api';
+import type { BorrowerApplication, RiskAssessmentResponse } from '@/types';
 
 interface ApplicationsContextValue {
   applications: LoanApplication[];
   addApplication: (application: LoanApplication) => void;
   updateStatus: (id: string, status: LoanStatus) => void;
+  submitApplication: (application: BorrowerApplication) => Promise<RiskAssessmentResponse>;
 }
 
 const ApplicationsContext = createContext<ApplicationsContextValue | null>(null);
@@ -65,9 +69,54 @@ export function ApplicationsProvider({ children }: { children: React.ReactNode }
     updateStoredApplicationStatus(id, status);
   }, []);
 
+  const submitApplication = useCallback(
+    async (borrowerApp: BorrowerApplication): Promise<RiskAssessmentResponse> => {
+      const assessment = await submitCreditScoreAssessment(borrowerApp);
+
+      const income = Number(borrowerApp.monthlyIncomePKR) || 0;
+      const requestedAmount = Number(borrowerApp.requestedLoanAmountPKR) || 0;
+      const altScore = assessment.credit_score;
+      const riskLevel = deriveRiskLevel(altScore);
+      const shapItems = assessment.shap_values || assessment.shap_explanations || [];
+
+      // Update and save local storage application with live assessment and SHAP items
+      const updatedApp: BorrowerApplication = {
+        ...borrowerApp,
+        assessment,
+        shap_values: shapItems,
+      };
+      saveApplicationLocally(updatedApp);
+
+      const loanApp: LoanApplication = {
+        id: borrowerApp.id,
+        applicantName: borrowerApp.fullName,
+        income,
+        requestedAmount,
+        altCreditScore: altScore,
+        riskLevel,
+        status: 'pending',
+        shap_values: shapItems,
+        shapFeatures: shapItems.map((v) => ({
+          featureName: v.featureName || v.feature_name || 'Feature',
+          impact: v.impact,
+          category: v.category || (v.impact >= 0 ? 'Score Driver' : 'Risk Flag'),
+        })),
+        assessment,
+        recommendation: assessment.recommendation,
+        confidenceScore: assessment.confidence_score,
+        defaultProbability: assessment.default_probability,
+        baseScore: 520,
+      };
+
+      addApplication(loanApp);
+      return assessment;
+    },
+    [addApplication]
+  );
+
   const value = useMemo(
-    () => ({ applications, addApplication, updateStatus }),
-    [applications, addApplication, updateStatus]
+    () => ({ applications, addApplication, updateStatus, submitApplication }),
+    [applications, addApplication, updateStatus, submitApplication]
   );
 
   return (

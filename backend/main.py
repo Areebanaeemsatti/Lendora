@@ -1,3 +1,5 @@
+import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -5,25 +7,52 @@ from fastapi.responses import JSONResponse
 from routers.health import router as health_router
 from routers.credit import router as credit_router
 from exceptions import InvalidFinancialRangeException, MissingCrucialSignalException
+from services.inference_service import InferenceService
+
+# Configure Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger("lendora.main")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    FastAPI lifespan handler:
+    Loads trained ML model artifacts, preprocessing pipeline, and SHAP explainer
+    into memory during server startup.
+    """
+    logger.info("Initializing Lendora backend service...")
+    try:
+        InferenceService.initialize_engine()
+        logger.info("Machine Learning inference engine and SHAP explainers loaded successfully.")
+    except Exception as e:
+        logger.warning(f"Engine initialization notice: {e}. Will lazily initialize on request.")
+    yield
+    logger.info("Shutting down Lendora backend service...")
+
 
 app = FastAPI(
     title="Lendora Alternative Credit Scoring API",
     description="""
-### Lendora Backend Services - Step 2 Ingestion, Feature Processing & Inference Wrapper
+### Lendora Backend Services - Step 3 Full ML Model Integration & Real SHAP Inference
 Alternative credit scoring engine for informal workers and micro-entrepreneurs in Pakistan.
 
 #### Key Features:
-* **Feature Processing & Cleaning**: Advanced domain validation and engineered metrics (daily velocity, utility delay ratio, wallet liquidity proxy).
-* **Plug-and-Play Inference Interface**: Loads ML artifacts (`model.pkl`) if available with smooth fallback to calibrated heuristic.
-* **SHAP Explainability**: Returns directional additive factor impacts and driver explanations.
-* **GET `/health`**: Service operational status check.
-* **POST `/api/v1/score`**: Ingests borrower signals, computes derived features, and generates scorecard.
-* **GET `/api/v1/samples`**: Fetches sample profiles from demo CSV dataset.
+* **Lifespan Startup ML Loader**: Pre-loads trained model and ColumnTransformer pipeline into memory.
+* **Full ML Inference**: Predicts probability of default using Member 1's trained alternative financial models.
+* **Standard Credit Score Scaling**: 300 to 850 score calibration where higher score = lower default risk.
+* **Real SHAP Explainability**: Computes local feature contributions, top 3 positive drivers, and top 3 negative risk flags.
+* **Underwriting Decision Support**: Computes confidence scores and recommendations (Approve Micro-Loan, Manual Review, Decline).
+* **Defensive Error Handling**: Domain validation exception handlers returning clean 422 and 400 responses.
     """,
-    version="2.0.0",
+    version="3.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    lifespan=lifespan
 )
 
 # Configure CORS middleware

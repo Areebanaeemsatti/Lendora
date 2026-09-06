@@ -1,461 +1,521 @@
 """
 Plug-and-Play Inference Service Wrapper for Lendora.
 
-Defines `predict_score(features: Dict[str, Any]) -> Dict[str, Any]`
-1. Checks for trained model artifact (e.g. `model.pkl`) in designated paths.
-2. If found, dynamically loads and predicts using the ML artifact.
-3. If not found, gracefully falls back to the calibrated mock heuristic without throwing errors.
-4. Generates SHAP-style explainability factors and 300-850 scaled scores.
+Integrates:
+1. Member 1's trained ML models (LightGBM / LogisticRegression / Scikit-learn Pipeline).
+2. Saved preprocessor with OneHotEncoder & StandardScaler.
+3. SHAP TreeExplainer and LinearExplainer for local feature contributions.
+4. Standard credit score scaling (300 to 850) where higher score = lower default risk.
+5. Lifespan pre-loading into memory at FastAPI startup.
+6. Extraction of top 3 positive drivers and top 3 negative risk flags.
 """
 import os
-import pickle
+import json
 import logging
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Union
+
+import numpy as np
+import pandas as pd
+import joblib
+import shap
+
+from services.feature_engineering import FeatureEngineeringService
 
 logger = logging.getLogger("lendora.inference")
 
 
 class InferenceService:
-    _cached_model: Any = None
-    _cached_model_path: Optional[Path] = None
-    _model_search_attempted: bool = False
+    _preprocessor: Any = None
+    _model: Any = None
+    _tree_model: Any = None
+    _explainer: Any = None
+    _threshold: float = 0.50
+    _model_name: str = "calibrated_heuristic"
+    _background: Any = None
+    _is_initialized: bool = False
 
     @classmethod
-    def get_candidate_model_paths(cls) -> List[Path]:
-        """Returns ordered list of designated model artifact paths."""
+    def get_artifact_dir(cls) -> Path:
+        """Locates the ml/artifacts directory."""
         current_dir = Path(__file__).resolve().parent
         backend_dir = current_dir.parent
         root_dir = backend_dir.parent
 
-        env_path = os.getenv("MODEL_PATH")
-        candidates = []
-        if env_path:
-            candidates.append(Path(env_path))
+        env_path = os.getenv("ARTIFACT_DIR")
+        if env_path and Path(env_path).exists():
+            return Path(env_path)
 
-        candidates.extend([
-            backend_dir / "models" / "model.pkl",
-            backend_dir / "model.pkl",
-            root_dir / "ml" / "model.pkl",
-            root_dir / "ml" / "artifacts" / "model.pkl",
-            root_dir / "ml" / "models" / "model.pkl",
-            root_dir / "ml" / "model.joblib",
-        ])
-        return candidates
+        candidates = [
+            root_dir / "ml" / "artifacts",
+            backend_dir / "models",
+            backend_dir / "artifacts",
+            Path("ml/artifacts"),
+            Path("../ml/artifacts"),
+        ]
+        for c in candidates:
+            if c.exists() and c.is_dir():
+                return c
+        return candidates[0]
 
     @classmethod
-    def load_model_if_available(cls) -> Tuple[Optional[Any], Optional[Path]]:
+    def initialize_engine(cls) -> None:
         """
-        Attempts to load model artifact. Caches result so disk I/O occurs once.
-        Returns (model_object, resolved_path) or (None, None) if not found.
+        Loads the trained model, preprocessor, and SHAP explainer into memory during FastAPI startup.
         """
-        if cls._model_search_attempted:
-            return cls._cached_model, cls._cached_model_path
+        if cls._is_initialized:
+            return
 
-        cls._model_search_attempted = True
-        for path in cls.get_candidate_model_paths():
-            if path.exists() and path.is_file():
+        artifact_dir = cls.get_artifact_dir()
+        logger.info(f"Initializing Lendora ML Inference Engine from: {artifact_dir}")
+
+        preprocessor_path = artifact_dir / "preprocessor.joblib"
+        model_path = artifact_dir / "best_model.joblib"
+        lgb_path = artifact_dir / "lightgbm_model.joblib"
+        threshold_path = artifact_dir / "decision_threshold.json"
+        summary_path = artifact_dir / "training_summary.json"
+        background_path = artifact_dir / "shap_background.joblib"
+
+        try:
+            # 1. Load Preprocessor
+            if preprocessor_path.exists():
+                cls._preprocessor = joblib.load(preprocessor_path)
+                # Patch sklearn cross-version compatibility attribute
+                if not hasattr(cls._preprocessor, "force_int_remainder_cols"):
+                    cls._preprocessor.force_int_remainder_cols = False
+                logger.info("Loaded ML feature preprocessor ColumnTransformer.")
+
+            # 2. Load Decision Threshold & Metadata
+            if threshold_path.exists():
                 try:
-                    logger.info(f"Loading Lendora ML model artifact from: {path}")
-                    with open(path, "rb") as f:
-                        cls._cached_model = pickle.load(f)
-                    cls._cached_model_path = path
-                    return cls._cached_model, cls._cached_model_path
+                    thresh_data = json.loads(threshold_path.read_text(encoding="utf-8"))
+                    cls._threshold = float(thresh_data.get("threshold", 0.50))
+                    cls._model_name = str(thresh_data.get("model", "best_model"))
                 except Exception as e:
-                    logger.warning(
-                        f"Found model artifact at {path} but failed to load ({e}). "
-                        "Falling back to calibrated heuristic."
-                    )
+                    logger.warning(f"Failed to read decision threshold: {e}")
 
-        logger.info("No model.pkl artifact found in designated paths. Using calibrated heuristic engine.")
-        return None, None
+            if summary_path.exists():
+                try:
+                    summary_data = json.loads(summary_path.read_text(encoding="utf-8"))
+                    cls._model_name = summary_data.get("best_model", cls._model_name)
+                except Exception as e:
+                    logger.warning(f"Failed to read training summary: {e}")
+
+            # 3. Load Trained Model
+            if model_path.exists():
+                cls._model = joblib.load(model_path)
+                # Patch sklearn LogisticRegression multi_class cross-version attribute
+                if not hasattr(cls._model, "multi_class"):
+                    cls._model.multi_class = "auto"
+                logger.info(f"Loaded primary model: {cls._model.__class__.__name__}")
+
+            # Also check for LightGBM tree model
+            if lgb_path.exists():
+                cls._tree_model = joblib.load(lgb_path)
+                logger.info("Loaded LightGBM tree model for SHAP TreeExplainer.")
+
+            # 4. Load SHAP Background
+            if background_path.exists():
+                cls._background = joblib.load(background_path)
+
+            # 5. Initialize SHAP Explainer
+            # If a tree-based model is available, prioritize TreeExplainer as requested
+            if cls._tree_model is not None:
+                try:
+                    cls._explainer = shap.TreeExplainer(cls._tree_model)
+                    logger.info("Initialized SHAP TreeExplainer on LightGBM.")
+                except Exception as e:
+                    logger.warning(f"Failed to init TreeExplainer on LightGBM: {e}")
+
+            if cls._explainer is None and cls._model is not None:
+                if cls._model.__class__.__name__ in ["LGBMClassifier", "XGBClassifier", "RandomForestClassifier"]:
+                    cls._explainer = shap.TreeExplainer(cls._model)
+                    logger.info(f"Initialized SHAP TreeExplainer on {cls._model.__class__.__name__}.")
+                elif cls._background is not None:
+                    cls._explainer = shap.LinearExplainer(cls._model, cls._background)
+                    logger.info("Initialized SHAP LinearExplainer on LogisticRegression.")
+
+            cls._is_initialized = True
+            logger.info(f"Lendora Inference Engine ready (Model: {cls._model_name}, Explainer: {type(cls._explainer).__name__ if cls._explainer else 'None'}).")
+
+        except Exception as e:
+            logger.exception(f"Unexpected error during ML engine initialization: {e}")
+            cls._is_initialized = True  # Avoid continuous re-triggering
 
     @classmethod
     def predict_score(cls, features: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Main entry point for inference.
-        Evaluates features and returns final score (300 to 850), default probability,
-        risk tier, and top contributing factors for SHAP.
+        Main prediction entry point.
+        Processes features through trained model & SHAP explainer,
+        falling back gracefully to calibrated heuristic if models are missing or fail.
         """
-        model, model_path = cls.load_model_if_available()
+        if not cls._is_initialized:
+            cls.initialize_engine()
 
-        if model is not None:
+        if cls._model is not None and cls._preprocessor is not None:
             try:
-                return cls._predict_via_ml_model(model, model_path, features)
+                return cls._predict_via_ml_model(features)
             except Exception as e:
                 logger.error(
-                    f"Inference via model artifact failed ({e}). "
-                    "Gracefully falling back to calibrated heuristic."
+                    f"Real ML inference failed ({e}). Gracefully falling back to calibrated heuristic."
                 )
 
-        # Fallback to calibrated heuristic
         return cls._predict_via_calibrated_heuristic(features)
 
     @classmethod
-    def _predict_via_ml_model(cls, model: Any, model_path: Path, features: Dict[str, Any]) -> Dict[str, Any]:
+    def _predict_via_ml_model(cls, features: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Executes inference via loaded ML model artifact.
-        Handles scikit-learn / XGBoost style objects.
+        Executes live inference through Member 1's trained preprocessing and classification models.
         """
-        import pandas as pd
-        import numpy as np
+        # 1. Map features to exact 26-column DataFrame expected by preprocessor
+        row_df = FeatureEngineeringService.to_ml_feature_row(features)
 
-        # Create single-row DataFrame from features
-        df_input = pd.DataFrame([features])
-        
-        # If model expects specific features, filter/align
-        if hasattr(model, "feature_names_in_"):
-            expected_cols = list(model.feature_names_in_)
-            # Fill missing columns with 0
-            for col in expected_cols:
-                if col not in df_input.columns:
-                    df_input[col] = 0.0
-            df_input = df_input[expected_cols]
+        # 2. Transform through fitted ColumnTransformer (produces 34-feature scaled array)
+        X_processed = cls._preprocessor.transform(row_df)
 
-        # Calculate default probability
-        if hasattr(model, "predict_proba"):
-            probs = model.predict_proba(df_input)[0]
-            # Assume second column is default (positive class 1)
-            default_prob = float(probs[1]) if len(probs) > 1 else float(probs[0])
-        elif hasattr(model, "predict"):
-            pred = model.predict(df_input)[0]
-            default_prob = float(np.clip(pred, 0.0, 1.0))
-        else:
-            raise ValueError("Loaded model object does not provide predict or predict_proba methods.")
+        # 3. Model Predict Probability of Default
+        probs = cls._model.predict_proba(X_processed)[0]
+        prob_default = float(probs[1]) if len(probs) > 1 else float(probs[0])
+        prob_default = max(0.01, min(0.99, prob_default))
 
-        # Map default probability to 300 - 850 credit score
-        creditworthiness = max(0.0, min(1.0, 1.0 - default_prob))
-        norm_score = int(round(creditworthiness * 100))
-        final_score = int(round(300 + (creditworthiness * 550)))
+        # 4. Standard Credit Score Scaling: 300 to 850 (higher score = lower default risk)
+        # Score formula: 850 - (prob_default * 550)
+        credit_score = int(round(850 - (prob_default * 550)))
+        credit_score = max(300, min(850, credit_score))
+        norm_score = int(round(max(0.0, min(100.0, (credit_score - 300) / 5.5))))
 
-        # Risk tiering
-        risk_tier, risk_cat, recommendation, max_mult = cls._map_risk_tier(final_score, default_prob)
+        # 5. Risk Tier: Low, Medium, or High Risk
+        risk_tier, risk_band, default_cat, recommendation, max_mult = cls._classify_risk_profile(credit_score, prob_default)
+
+        # 6. Confidence Score based on input completeness
+        confidence_score = features.get("confidence_score")
+        if confidence_score is None:
+            confidence_score = FeatureEngineeringService.calculate_confidence_score(features)
+
+        # 7. Compute SHAP Explanations & Extract Top 3 Drivers
+        shap_explanations, top_pos_drivers, top_neg_drivers, feature_importance_items = cls._explain_prediction_shap(
+            row_df, X_processed, credit_score, prob_default
+        )
+
         disposable_income = features.get("disposable_income_pkr", 15000.0)
         requested_loan = features.get("requestedLoanAmountPKR", 100000.0)
         max_approved_loan = round(min(requested_loan * 1.25, disposable_income * max_mult * 3), -3)
 
-        # Generate SHAP contributing factors
-        shap_factors, positive_drivers, risk_drivers = cls._compute_shap_factors(features, final_score)
-
         return {
-            "final_score": final_score,
+            "credit_score": credit_score,
+            "final_score": credit_score,
             "normalized_score": norm_score,
-            "default_probability": round(default_prob, 4),
-            "default_probability_pct": round(default_prob * 100, 2),
             "risk_tier": risk_tier,
-            "default_risk_category": risk_cat,
+            "risk_band": risk_band,
+            "default_probability": round(prob_default, 4),
+            "default_probability_pct": round(prob_default * 100, 2),
+            "confidence_score": float(confidence_score),
+            "decision_threshold": round(cls._threshold, 2),
             "recommendation": recommendation,
             "max_approved_loan_amount_pkr": float(max_approved_loan),
-            "top_contributing_factors": shap_factors,
-            "top_positive_drivers": positive_drivers,
-            "top_risk_drivers": risk_drivers,
-            "model_type_used": "trained_ml_model",
-            "model_artifact_path": str(model_path)
+            "shap_explanations": shap_explanations,
+            "top_positive_drivers": top_pos_drivers,
+            "top_negative_drivers": top_neg_drivers,
+            "top_contributing_factors": feature_importance_items,
+            "feature_importance_items": feature_importance_items,
+            "model_type_used": f"trained_{cls._model_name}",
+            "decision": "High Risk" if prob_default >= cls._threshold else "Low Risk",
+            "score_breakdown": cls._approximate_score_breakdown(features, norm_score)
+        }
+
+    @classmethod
+    def _explain_prediction_shap(
+        cls,
+        row_df: pd.DataFrame,
+        X_processed: np.ndarray,
+        credit_score: int,
+        prob_default: float
+    ) -> Tuple[List[Dict[str, Any]], List[str], List[str], List[Dict[str, Any]]]:
+        """
+        Computes real SHAP values, extracts top 3 positive drivers and top 3 negative risk flags,
+        and constructs the structured shap_explanations list.
+        """
+        source_columns = list(row_df.columns)
+        grouped_shap: Dict[str, float] = {col: 0.0 for col in source_columns}
+
+        try:
+            if cls._explainer is not None:
+                is_tree = "Tree" in type(cls._explainer).__name__
+                if is_tree:
+                    # TreeExplainer on LightGBM expects 26 numeric columns (categoricals label-encoded)
+                    provider_map = {"Easypaisa": 0.0, "JazzCash": 1.0, "SadaPay": 2.0, "NayaPay": 3.0}
+                    occ_map = {
+                        "daily_wage_laborer": 0.0,
+                        "delivery_rider": 1.0,
+                        "domestic_worker": 2.0,
+                        "rickshaw_driver": 3.0,
+                        "small_shopkeeper": 4.0,
+                        "street_vendor": 5.0
+                    }
+                    row_numeric = row_df.copy()
+                    row_numeric["provider"] = [float(provider_map.get(str(x), 0.0)) for x in row_numeric["provider"]]
+                    row_numeric["occupation"] = [float(occ_map.get(str(x), 0.0)) for x in row_numeric["occupation"]]
+                    X_input = row_numeric.astype(float).to_numpy()
+                    shap_raw = cls._explainer.shap_values(X_input)
+                else:
+                    shap_raw = cls._explainer.shap_values(X_processed)
+
+                # Normalize SHAP array returns
+                if isinstance(shap_raw, list):
+                    arr = shap_raw[1] if len(shap_raw) > 1 else shap_raw[0]
+                else:
+                    arr = shap_raw
+
+                if arr.ndim == 3:
+                    values = arr[0, :, 1]
+                else:
+                    values = arr[0]
+
+                if is_tree and len(values) == len(source_columns):
+                    for col, val in zip(source_columns, values):
+                        grouped_shap[col] = float(val)
+                else:
+                    # Map transformed 34 features back to source 26 features
+                    transformed_names = cls._preprocessor.get_feature_names_out()
+                    for transformed_name, val in zip(transformed_names, values):
+                        clean_name = transformed_name.split("__", 1)[-1]
+                        source = next(
+                            (col for col in source_columns if clean_name == col or clean_name.startswith(f"{col}_")),
+                            clean_name
+                        )
+                        grouped_shap[source] = grouped_shap.get(source, 0.0) + float(val)
+
+        except Exception as e:
+            logger.warning(f"Real-time SHAP computation notice: {e}. Generating proxy SHAP attributions.")
+            grouped_shap = cls._fallback_shap_contributions(row_df)
+
+        # In standard risk models:
+        # positive SHAP value = increases default risk = negative impact on credit score (- points).
+        # negative SHAP value = decreases default risk = positive impact on credit score (+ points).
+        # We scale SHAP values to score points (300 to 850 space).
+        score_multiplier = -250.0  # Scale log-odds/margin SHAP to score points
+
+        items: List[Dict[str, Any]] = []
+        for feature, shap_val in grouped_shap.items():
+            if feature not in row_df.columns:
+                continue
+            raw_val = row_df.iloc[0][feature]
+            # Convert NumPy scalar to native Python scalar to avoid serialization issues
+            if hasattr(raw_val, "item"):
+                raw_val = raw_val.item()
+            elif isinstance(raw_val, (np.floating, float)):
+                raw_val = float(raw_val)
+            elif isinstance(raw_val, (np.integer, int)):
+                raw_val = int(raw_val)
+            elif isinstance(raw_val, (np.bool_, bool)):
+                raw_val = bool(raw_val)
+
+            score_impact = round(float(shap_val) * score_multiplier, 1)
+
+            # Direction: positive impact on score vs negative risk flag
+            if score_impact >= 0:
+                direction = "positive"
+                explanation = cls._generate_feature_explanation(feature, raw_val, is_positive=True)
+            else:
+                direction = "negative"
+                explanation = cls._generate_feature_explanation(feature, raw_val, is_positive=False)
+
+            items.append({
+                "feature_name": str(feature),
+                "raw_value": raw_val,
+                "impact": float(score_impact),
+                "direction": str(direction),
+                "shap_value": round(float(shap_val), 4),
+                "explanation": str(explanation)
+            })
+
+        # Top 3 positive drivers (+ impact on score / reduces default)
+        positive_sorted = sorted([item for item in items if item["impact"] >= 0], key=lambda x: x["impact"], reverse=True)
+        top_pos = positive_sorted[:3]
+        top_pos_drivers = [f"{item['feature_name']}: {item['explanation']} (+{item['impact']} pts)" for item in top_pos]
+
+        # Top 3 negative risk flags (- impact on score / increases default)
+        negative_sorted = sorted([item for item in items if item["impact"] < 0], key=lambda x: abs(x["impact"]), reverse=True)
+        top_neg = negative_sorted[:3]
+        top_neg_drivers = [f"{item['feature_name']}: {item['explanation']} ({item['impact']} pts)" for item in top_neg]
+
+        # Ensure fallback drivers exist
+        if not top_pos_drivers:
+            top_pos_drivers = ["Consistent digital wallet activity", "Positive cash-in buffer", "Timely utility payments"]
+        if not top_neg_drivers:
+            top_neg_drivers = ["Limited formal credit history record"]
+
+        # Combined top explanations
+        shap_explanations = (top_pos + top_neg) if (top_pos or top_neg) else items[:6]
+
+        # Structure for UI featureImportance backward compatibility
+        feature_importance_items = []
+        for item in shap_explanations:
+            feature_importance_items.append({
+                "featureName": item["feature_name"],
+                "displayName": item["feature_name"].replace("_", " ").title(),
+                "impact": item["direction"],
+                "weight": round(min(35.0, abs(item["impact"]) / 3.0), 1),
+                "shapValue": item["impact"],
+                "description": item["explanation"]
+            })
+
+        return shap_explanations, top_pos_drivers, top_neg_drivers, feature_importance_items
+
+    @staticmethod
+    def _generate_feature_explanation(feature: str, val: Any, is_positive: bool) -> str:
+        """Generates clear, contextual human-readable explanation for the feature."""
+        try:
+            float_val = float(val)
+        except (ValueError, TypeError):
+            float_val = 0.0
+
+        if feature == "wallet_txn_count_90d":
+            return f"90-day wallet transaction volume ({val}) {'signals healthy digital cash velocity' if is_positive else 'indicates low account usage'}."
+        elif feature == "wallet_txn_count_30d":
+            return f"Recent 30-day activity ({val} txns) {'reflects steady recurring liquidity' if is_positive else 'shows slowing transactional momentum'}."
+        elif feature == "wallet_active_days_ratio_90d":
+            return f"Active days density ({round(float_val * 100, 1)}%) {'demonstrates habitual daily financial engagement' if is_positive else 'signals irregular wallet activity'}."
+        elif feature == "wallet_avg_balance":
+            return f"Average balance (PKR {float_val:,.0f}) {'provides a robust liquid safety buffer' if is_positive else 'shows tight disposable reserves'}."
+        elif feature == "wallet_bill_payment_count_90d":
+            return f"Utility payment count ({val}) {'verifies disciplined recurring expense management' if is_positive else 'indicates sparse utility bill records'}."
+        elif feature == "bill_payment_consistency":
+            return f"Bill payment consistency score ({round(float_val, 2)}) {'indicates exceptional repayment habits' if is_positive else 'reflects inconsistent biller diversity'}."
+        elif feature == "wallet_inflow_outflow_ratio":
+            return f"Cashflow ratio ({val}) {'confirms income exceeds living outflows' if is_positive else 'signals cashflow stress (outflows outpace inflows)'}."
+        elif feature == "wallet_topup_avg_amount":
+            return f"Average top-up amount (PKR {float_val:,.0f}) {'demonstrates high purchasing capacity' if is_positive else 'shows modest transaction ticket size'}."
+        elif feature == "wallet_days_since_last_txn":
+            return f"Recency of last transaction ({val} days ago) {'verifies active operational status' if is_positive else 'indicates stale wallet activity'}."
+        elif feature == "provider":
+            return f"Primary mobile money operator ({val}) verification verified."
+        elif feature == "occupation":
+            return f"Micro-business classification ({val}) aligned with sectoral earning benchmarks."
+        else:
+            return f"Feature {feature} with value {val} {'positively reinforces creditworthiness' if is_positive else 'represents an underwriting risk factor'}."
+
+    @staticmethod
+    def _fallback_shap_contributions(row_df: pd.DataFrame) -> Dict[str, float]:
+        """Calculates proxy SHAP direction if explainer is not ready."""
+        contributions = {}
+        row = row_df.iloc[0]
+        
+        # Transaction count
+        tx = float(row.get("wallet_txn_count_90d", 30))
+        contributions["wallet_txn_count_90d"] = -0.25 if tx >= 45 else 0.20
+
+        # Balance
+        bal = float(row.get("wallet_avg_balance", 2000))
+        contributions["wallet_avg_balance"] = -0.20 if bal >= 3500 else 0.18
+
+        # Bill payment
+        bills = float(row.get("wallet_bill_payment_count_90d", 2))
+        contributions["wallet_bill_payment_count_90d"] = -0.18 if bills >= 3 else 0.15
+
+        # Active days
+        days = float(row.get("wallet_active_days_ratio_90d", 0.5))
+        contributions["wallet_active_days_ratio_90d"] = -0.15 if days >= 0.6 else 0.12
+
+        # Cashflow stress
+        inflow = float(row.get("wallet_inflow_outflow_ratio", 1.0))
+        contributions["wallet_inflow_outflow_ratio"] = -0.15 if inflow >= 1.05 else 0.25
+
+        return contributions
+
+    @staticmethod
+    def _classify_risk_profile(score: int, prob_default: float) -> Tuple[str, str, str, str, float]:
+        """
+        Standardized risk tiering and decision mapping:
+        - risk_tier: 'Low Risk', 'Medium Risk', 'High Risk'
+        - risk_band: 'Low Risk', 'Moderate Risk', 'Elevated Risk', 'High Risk'
+        - recommendation: 'Approve Micro-Loan', 'Approve with Conditions', 'Manual Review', 'Decline'
+        """
+        if score >= 750:
+            return "Low Risk", "Low Risk", "Low", "Approve Micro-Loan", 3.5
+        elif score >= 650:
+            return "Medium Risk", "Moderate Risk", "Medium", "Approve with Conditions", 2.5
+        elif score >= 550:
+            return "Medium Risk", "Elevated Risk", "Elevated", "Manual Review", 1.8
+        else:
+            return "High Risk", "High Risk", "High", "Decline", 1.0
+
+    @classmethod
+    def _approximate_score_breakdown(cls, features: Dict[str, Any], norm_score: int) -> Dict[str, float]:
+        """Calculates component sub-scores."""
+        dti = features.get("debt_to_income_ratio", 45.0)
+        vel = features.get("transaction_velocity_daily", 1.0)
+        on_time = features.get("utilityBillOnTimeRate", 85.0)
+        repay = features.get("onTimeRepaymentRate", 85.0)
+
+        cash_sub = max(20.0, min(100.0, 100.0 - (dti * 0.8)))
+        digital_sub = max(20.0, min(100.0, 30.0 + (vel * 30.0)))
+        utility_sub = max(20.0, min(100.0, float(on_time)))
+        repay_sub = max(20.0, min(100.0, float(repay)))
+
+        return {
+            "cashFlowScore": round(cash_sub, 1),
+            "digitalFootprintScore": round(digital_sub, 1),
+            "utilityPaymentScore": round(utility_sub, 1),
+            "repaymentHistoryScore": round(repay_sub, 1),
         }
 
     @classmethod
     def _predict_via_calibrated_heuristic(cls, features: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Calibrated heuristic scoring engine based on Pakistani informal sector benchmarks.
-        Returns final score (300-850), default probability, risk tier, and SHAP factors.
+        Calibrated heuristic fallback when ML artifact files are not available.
         """
         # Feature Inputs
         dti = features.get("debt_to_income_ratio", 50.0)
         dscr = features.get("debt_service_coverage_ratio", 1.0)
-        disposable_income = features.get("disposable_income_pkr", 0.0)
+        disposable_income = features.get("disposable_income_pkr", 15000.0)
         requested_loan = features.get("requestedLoanAmountPKR", 100000.0)
         
-        velocity_daily = features.get("transaction_velocity_daily", 0.0)
-        wallet_tx = features.get("total_monthly_wallet_tx", 0)
-        recharge = features.get("monthlyMobileRechargePKR", 0.0)
-        wallet_balance_proxy = features.get("wallet_cash_balance_proxy", 0.5)
-        
-        utility_delay_ratio = features.get("utility_delay_ratio", 0.2)
-        utility_on_time = features.get("utilityBillOnTimeRate", 80.0)
-        utility_bill = features.get("monthlyUtilityBillPKR", 0.0)
-        
+        velocity_daily = features.get("transaction_velocity_daily", 1.0)
+        utility_delay_ratio = features.get("utility_delay_ratio", 0.15)
         repayment_discipline = features.get("repayment_discipline_index", 0.6)
         defaults_count = features.get("previousDefaultsCount", 0)
-        loans_count = features.get("previousLoansCount", 0)
-        credit_years = features.get("creditHistoryYears", 0)
-        has_bank = features.get("hasBankAccount", "No")
 
-        # 1. Cash Flow & Leverage Sub-score (35% weight)
-        cash_score = 50.0
-        if dti <= 35:
-            cash_score += 35.0
-        elif dti <= 50:
-            cash_score += 20.0
-        elif dti <= 65:
-            cash_score += 5.0
-        else:
-            cash_score -= 25.0
-
-        if dscr >= 2.0:
-            cash_score += 15.0
-        elif dscr >= 1.2:
-            cash_score += 8.0
-        else:
-            cash_score -= 15.0
-        cash_score = max(5.0, min(100.0, cash_score))
-
-        # 2. Digital Footprint & Velocity Sub-score (25% weight)
-        digital_score = 40.0
-        if velocity_daily >= 1.5:  # > 45 txns/month
-            digital_score += 35.0
-        elif velocity_daily >= 0.8:  # > 24 txns/month
-            digital_score += 20.0
-        elif velocity_daily >= 0.3:  # > 9 txns/month
-            digital_score += 10.0
-        else:
-            digital_score -= 10.0
-
-        if recharge >= 3000:
-            digital_score += 20.0
-        elif recharge >= 1500:
-            digital_score += 10.0
-        elif recharge >= 500:
-            digital_score += 5.0
-
-        if wallet_balance_proxy >= 0.65:
-            digital_score += 10.0
-        digital_score = max(5.0, min(100.0, digital_score))
-
-        # 3. Utility Payment Reliability Sub-score (20% weight)
-        # utility_delay_ratio: 0.0 = perfect, 1.0 = poor
-        utility_score = max(0.0, 100.0 - (utility_delay_ratio * 90.0))
-        if utility_bill >= 5000 and utility_delay_ratio < 0.15:
-            utility_score += 10.0
-        utility_score = max(5.0, min(100.0, utility_score))
-
-        # 4. Repayment Discipline Sub-score (20% weight)
-        repayment_score = repayment_discipline * 85.0
-        if defaults_count > 0:
-            repayment_score -= (defaults_count * 25.0)
-        if credit_years >= 2:
-            repayment_score += 10.0
-        if has_bank == "Yes":
-            repayment_score += 5.0
-        repayment_score = max(5.0, min(100.0, repayment_score))
-
-        # Composite Normalized Score (0 - 100)
+        # Baseline composite score
         norm_score = int(round(
-            (cash_score * 0.35) +
-            (digital_score * 0.25) +
-            (utility_score * 0.20) +
-            (repayment_score * 0.20)
+            (max(10.0, 100.0 - dti) * 0.35) +
+            (min(100.0, velocity_daily * 45.0) * 0.25) +
+            (max(10.0, 100.0 - utility_delay_ratio * 100.0) * 0.20) +
+            (repayment_discipline * 100.0 * 0.20)
         ))
-        norm_score = max(15, min(96, norm_score))
+        norm_score = max(20, min(95, norm_score))
+        credit_score = int(round(300 + (norm_score / 100.0) * 550))
+        prob_default = round(max(0.04, min(0.85, (850 - credit_score) / 550.0)), 4)
 
-        # Scaled Score: 300 to 850
-        final_score = int(round(300 + (norm_score / 100.0) * 550))
+        risk_tier, risk_band, default_cat, recommendation, max_mult = cls._classify_risk_profile(credit_score, prob_default)
+        confidence_score = features.get("confidence_score") or FeatureEngineeringService.calculate_confidence_score(features)
 
-        # Default Probability Curve
-        # Low risk (~4-10%), Moderate (~11-25%), Elevated (~26-50%), High (>50%)
-        if final_score >= 740:
-            default_prob = round(0.04 + (850 - final_score) * 0.0004, 4)
-        elif final_score >= 670:
-            default_prob = round(0.08 + (740 - final_score) * 0.0012, 4)
-        elif final_score >= 580:
-            default_prob = round(0.18 + (670 - final_score) * 0.0022, 4)
-        else:
-            default_prob = round(0.40 + (580 - final_score) * 0.0025, 4)
-        default_prob = min(0.85, max(0.03, default_prob))
-
-        # Risk Tiering (matching frontend 'low' | 'moderate' | 'elevated' | 'high')
-        risk_tier, risk_cat, recommendation, max_mult = cls._map_risk_tier(final_score, default_prob)
+        # Generate structured SHAP factors
+        row_df = FeatureEngineeringService.to_ml_feature_row(features)
+        shap_explanations, top_pos, top_neg, feature_importance_items = cls._explain_prediction_shap(
+            row_df, np.zeros((1, 34)), credit_score, prob_default
+        )
 
         max_approved_loan = round(min(requested_loan * 1.2, disposable_income * max_mult * 3), -3)
 
-        # SHAP Contributing Factors
-        shap_factors, positive_drivers, risk_drivers = cls._compute_shap_factors(features, final_score)
-
         return {
-            "final_score": final_score,
+            "credit_score": credit_score,
+            "final_score": credit_score,
             "normalized_score": norm_score,
-            "default_probability": default_prob,
-            "default_probability_pct": round(default_prob * 100, 2),
             "risk_tier": risk_tier,
-            "default_risk_category": risk_cat,
+            "risk_band": risk_band,
+            "default_probability": prob_default,
+            "default_probability_pct": round(prob_default * 100, 2),
+            "confidence_score": float(confidence_score),
+            "decision_threshold": round(cls._threshold, 2),
             "recommendation": recommendation,
             "max_approved_loan_amount_pkr": float(max_approved_loan),
-            "score_breakdown": {
-                "cashFlowScore": round(cash_score, 1),
-                "digitalFootprintScore": round(digital_score, 1),
-                "utilityPaymentScore": round(utility_score, 1),
-                "repaymentHistoryScore": round(repayment_score, 1)
-            },
-            "top_contributing_factors": shap_factors,
-            "top_positive_drivers": positive_drivers,
-            "top_risk_drivers": risk_drivers,
+            "shap_explanations": shap_explanations,
+            "top_positive_drivers": top_pos,
+            "top_negative_drivers": top_neg,
+            "top_contributing_factors": feature_importance_items,
+            "feature_importance_items": feature_importance_items,
             "model_type_used": "calibrated_heuristic",
-            "model_artifact_path": None
+            "decision": "High Risk" if prob_default >= cls._threshold else "Low Risk",
+            "score_breakdown": cls._approximate_score_breakdown(features, norm_score)
         }
-
-    @staticmethod
-    def _map_risk_tier(final_score: int, default_prob: float) -> Tuple[str, str, str, float]:
-        """
-        Maps score and default probability to:
-        - risk_tier: 'low' | 'moderate' | 'elevated' | 'high'
-        - default_risk_category: display label
-        - recommendation: decision
-        - max_loan_multiplier: debt capacity multiplier
-        """
-        if final_score >= 740:
-            return "low", "Low", "Approved", 3.5
-        elif final_score >= 660:
-            return "moderate", "Moderate", "Approved", 2.6
-        elif final_score >= 570:
-            return "elevated", "Elevated", "Approved with Conditions", 1.8
-        else:
-            return "high", "High", "Rejected" if final_score < 480 else "Manual Review Required", 1.0
-
-    @classmethod
-    def _compute_shap_factors(
-        cls,
-        features: Dict[str, Any],
-        final_score: int
-    ) -> Tuple[List[Dict[str, Any]], List[str], List[str]]:
-        """
-        Computes SHAP-style attribution scores representing additive impact on final score.
-        Baseline reference score for unbanked informal applicant is 550.
-        """
-        baseline_score = 550
-        delta = final_score - baseline_score
-
-        shap_factors: List[Dict[str, Any]] = []
-        positive_drivers: List[str] = []
-        risk_drivers: List[str] = []
-
-        # 1. Transaction Velocity Factor
-        velocity_daily = features.get("transaction_velocity_daily", 0.0)
-        wallet_tx = features.get("total_monthly_wallet_tx", 0)
-        if velocity_daily >= 1.0:
-            pts = round(min(55.0, 20.0 + (velocity_daily * 15.0)), 1)
-            shap_factors.append({
-                "featureName": "transaction_velocity_daily",
-                "displayName": "Mobile Wallet Transaction Velocity",
-                "impact": "positive",
-                "weight": 25.0,
-                "shapValue": pts,
-                "description": f"Daily velocity of {velocity_daily} txns ({wallet_tx}/mo) boosts score by +{pts} pts."
-            })
-            positive_drivers.append(f"High mobile wallet transaction density ({wallet_tx} monthly transactions)")
-        else:
-            pts = round(-1 * max(10.0, (1.0 - velocity_daily) * 30.0), 1)
-            shap_factors.append({
-                "featureName": "transaction_velocity_daily",
-                "displayName": "Mobile Wallet Transaction Velocity",
-                "impact": "negative" if wallet_tx < 15 else "neutral",
-                "weight": 15.0,
-                "shapValue": pts,
-                "description": f"Subdued digital wallet activity ({wallet_tx}/mo) deducts {abs(pts)} pts."
-            })
-            if wallet_tx < 15:
-                risk_drivers.append(f"Low digital wallet transaction velocity ({wallet_tx} monthly transactions)")
-
-        # 2. Utility Delay Ratio Factor
-        utility_delay = features.get("utility_delay_ratio", 0.1)
-        on_time_pct = features.get("utilityBillOnTimeRate", 90.0)
-        if utility_delay <= 0.10:  # >= 90% on-time
-            pts = round(35.0 - (utility_delay * 100.0), 1)
-            shap_factors.append({
-                "featureName": "utility_delay_ratio",
-                "displayName": "Utility Bill Delay Ratio",
-                "impact": "positive",
-                "weight": 20.0,
-                "shapValue": pts,
-                "description": f"Consistent on-time utility payments ({on_time_pct}%) contributes +{pts} pts."
-            })
-            positive_drivers.append(f"Consistently timely utility bill payments ({on_time_pct}% on-time)")
-        else:
-            pts = round(-1 * (utility_delay * 60.0), 1)
-            shap_factors.append({
-                "featureName": "utility_delay_ratio",
-                "displayName": "Utility Bill Delay Ratio",
-                "impact": "negative",
-                "weight": 20.0,
-                "shapValue": pts,
-                "description": f"Late utility payment frequency ({round(utility_delay*100, 1)}% delay) deducts {abs(pts)} pts."
-            })
-            risk_drivers.append(f"Irregular utility payment track record ({round(utility_delay*100, 1)}% delay ratio)")
-
-        # 3. Debt-To-Income (DTI) Factor
-        dti = features.get("debt_to_income_ratio", 45.0)
-        if dti <= 40.0:
-            pts = round(40.0 - (dti * 0.5), 1)
-            shap_factors.append({
-                "featureName": "debt_to_income_ratio",
-                "displayName": "Debt-to-Income Ratio (DTI)",
-                "impact": "positive",
-                "weight": 30.0,
-                "shapValue": pts,
-                "description": f"Favorable debt-to-income profile ({dti}%) provides +{pts} pts capacity headroom."
-            })
-            positive_drivers.append(f"Healthy debt-to-income ratio ({dti}%) with ample cash reserve")
-        else:
-            pts = round(-1 * min(65.0, (dti - 40.0) * 1.5), 1)
-            shap_factors.append({
-                "featureName": "debt_to_income_ratio",
-                "displayName": "Debt-to-Income Ratio (DTI)",
-                "impact": "negative",
-                "weight": 30.0,
-                "shapValue": pts,
-                "description": f"Elevated debt-to-income burden ({dti}%) reduces score by {abs(pts)} pts."
-            })
-            risk_drivers.append(f"Elevated debt-to-income ratio ({dti}%)")
-
-        # 4. Wallet Cash Balance / Surplus Proxy
-        wallet_proxy = features.get("wallet_cash_balance_proxy", 0.5)
-        if wallet_proxy >= 0.6:
-            pts = round(wallet_proxy * 25.0, 1)
-            shap_factors.append({
-                "featureName": "wallet_cash_balance_proxy",
-                "displayName": "Wallet Cash-In/Out Balance Proxy",
-                "impact": "positive",
-                "weight": 15.0,
-                "shapValue": pts,
-                "description": f"Positive liquid balance buffer adds +{pts} pts to liquidity confidence."
-            })
-            positive_drivers.append("Healthy liquid cash-in buffer maintained in digital wallet")
-        else:
-            pts = round(-1 * ((0.6 - wallet_proxy) * 30.0), 1)
-            shap_factors.append({
-                "featureName": "wallet_cash_balance_proxy",
-                "displayName": "Wallet Cash-In/Out Balance Proxy",
-                "impact": "neutral" if pts >= -5 else "negative",
-                "weight": 10.0,
-                "shapValue": pts,
-                "description": f"Tighter liquid wallet cushion contributes {pts} pts."
-            })
-
-        # 5. Defaults History
-        defaults = features.get("previousDefaultsCount", 0)
-        if defaults > 0:
-            pts = round(-1 * (defaults * 45.0), 1)
-            shap_factors.append({
-                "featureName": "previousDefaultsCount",
-                "displayName": "Historical Defaults Count",
-                "impact": "negative",
-                "weight": 25.0,
-                "shapValue": pts,
-                "description": f"History of {defaults} prior default(s) applies heavy penalty of {pts} pts."
-            })
-            risk_drivers.append(f"{defaults} previous loan default(s) recorded in profile")
-        else:
-            shap_factors.append({
-                "featureName": "previousDefaultsCount",
-                "displayName": "Historical Defaults Count",
-                "impact": "positive",
-                "weight": 15.0,
-                "shapValue": 25.0,
-                "description": "Clean default history with 0 recorded defaults grants +25.0 pts bonus."
-            })
-            positive_drivers.append("Flawless track record with zero previous loan defaults")
-
-        if not positive_drivers:
-            positive_drivers.append("Consistent micro-enterprise cash flow in regional market")
-        if not risk_drivers:
-            risk_drivers.append("Unverified informal cash income without banking trail")
-
-        return shap_factors, positive_drivers, risk_drivers

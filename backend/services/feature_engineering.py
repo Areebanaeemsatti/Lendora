@@ -5,9 +5,12 @@ Handles:
 1. Raw borrower input ingestion and sanitization.
 2. Edge-case validation and domain constraint checking (raising custom exceptions).
 3. Computation of derived financial, velocity, and alternative behavioral metrics.
+4. Formatting inputs into the exact 26 features required by Member 1's ML preprocessor and model.
 """
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, Tuple
 import math
+import numpy as np
+import pandas as pd
 
 from exceptions import InvalidFinancialRangeException, MissingCrucialSignalException
 from schemas.borrower import BorrowerInput
@@ -184,7 +187,7 @@ class FeatureEngineeringService:
         # Normalize Text Fields
         city = (raw.get("city") or "Lahore").strip()
         province = (raw.get("province") or "Punjab").strip()
-        occupation = (raw.get("occupation") or "Informal Merchant").strip()
+        raw_occ = (raw.get("occupation") or "small_shopkeeper").strip()
         employment_type = (raw.get("employmentType") or "Self-employed").strip()
 
         has_bank_account = str(raw.get("hasBankAccount") or "No").strip().capitalize()
@@ -203,13 +206,14 @@ class FeatureEngineeringService:
 
         repayment_grade = (raw.get("repaymentHistoryGrade") or "No previous borrowing history").strip()
 
+        # Cleaned record
         return {
             "borrowerId": raw.get("borrowerId") or "LND-UNASSIGNED",
             "fullName": (raw.get("fullName") or "Anonymous Borrower").strip(),
             "age": age,
             "city": city,
             "province": province,
-            "occupation": occupation,
+            "occupation": raw_occ,
             "employmentType": employment_type,
             "monthlyIncomePKR": monthly_income,
             "monthlyExpensesPKR": monthly_expenses,
@@ -230,18 +234,28 @@ class FeatureEngineeringService:
             "hasBankAccount": has_bank_account,
             "hasFormalCreditHistory": has_formal_credit,
             "traditionalCreditNotes": raw.get("traditionalCreditNotes") or "",
-            "supportingDocuments": raw.get("supportingDocuments") or []
+            "supportingDocuments": raw.get("supportingDocuments") or [],
+            # Direct alternative features if provided in raw payload
+            "provider": raw.get("provider"),
+            "wallet_active_days_ratio_90d": raw.get("wallet_active_days_ratio_90d"),
+            "wallet_txn_count_90d": raw.get("wallet_txn_count_90d"),
+            "wallet_txn_count_30d": raw.get("wallet_txn_count_30d"),
+            "wallet_days_since_last_txn": raw.get("wallet_days_since_last_txn"),
+            "wallet_topup_count_90d": raw.get("wallet_topup_count_90d"),
+            "wallet_topup_avg_amount": raw.get("wallet_topup_avg_amount"),
+            "wallet_topup_frequency_per_month": raw.get("wallet_topup_frequency_per_month"),
+            "wallet_bill_payment_count_90d": raw.get("wallet_bill_payment_count_90d"),
+            "wallet_bill_payment_share": raw.get("wallet_bill_payment_share"),
+            "wallet_distinct_billers_90d": raw.get("wallet_distinct_billers_90d"),
+            "wallet_avg_balance": raw.get("wallet_avg_balance"),
+            "wallet_inflow_outflow_ratio": raw.get("wallet_inflow_outflow_ratio"),
+            "wallet_txn_amount_volatility": raw.get("wallet_txn_amount_volatility"),
         }
 
     @classmethod
     def compute_derived_features(cls, cleaned: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Computes advanced derived metrics required by the scoring models:
-        - Transaction velocity (daily and weekly)
-        - Utility delay ratio
-        - Wallet cash-in vs cash-out balance proxy
-        - Financial leverage & capacity metrics
-        - Behavioral alternative indices
+        Computes advanced derived metrics required by the scoring models.
         """
         income = cleaned["monthlyIncomePKR"]
         expenses = cleaned["monthlyExpensesPKR"]
@@ -261,57 +275,47 @@ class FeatureEngineeringService:
         defaults_count = cleaned["previousDefaultsCount"]
         repayment_rate = cleaned["onTimeRepaymentRate"]
 
-        # 1. Transaction Velocity (Daily & Weekly)
+        # 1. Transaction Velocity
         transaction_velocity_daily = round(total_wallet_tx / 30.0, 3)
         transaction_velocity_weekly = round(total_wallet_tx / 4.33, 2)
 
-        # 2. Utility Delay Ratio (0.0 = perfect on-time, 1.0 = completely delinquent)
+        # 2. Utility Delay Ratio
         utility_delay_ratio = round(max(0.0, 100.0 - utility_on_time) / 100.0, 3)
 
         # 3. Disposable Income & Debt Capacity
-        monthly_debt_service = debt * 0.10  # 10% monthly service proxy
+        monthly_debt_service = debt * 0.10
         disposable_income = max(0.0, income - expenses - monthly_debt_service)
         dti_ratio = round(((expenses + monthly_debt_service) / income * 100.0) if income > 0 else 100.0, 2)
         
-        # Estimated monthly installment for requested loan (with 15% annual markup proxy)
         estimated_monthly_installment = round((requested_loan / term_months) * 1.15, 2)
         dscr = round(disposable_income / max(1.0, estimated_monthly_installment), 2)
         loan_to_income_ratio = round(requested_loan / max(1.0, income * 12.0), 3)
         installment_to_income_ratio = round((estimated_monthly_installment / max(1.0, income)) * 100.0, 2)
 
-        # 4. Wallet Cash-In vs Cash-Out Balance Proxy
-        # In informal Pakistani commerce, cash-in is income flowing via merchants/agents,
-        # cash-out is expenses, bills, mobile recharge, and vendor remittances.
-        # This proxy assesses whether the borrower maintains a positive liquid buffer.
+        # 4. Wallet Cash Balance Proxy
         net_liquid_surplus = disposable_income
         outflow_burden = max(1.0, recharge + utility_bill + (monthly_debt_service * 0.5))
         balance_ratio = round(net_liquid_surplus / outflow_burden, 2)
         
-        # Normalized wallet balance index [0.0 - 1.0]
-        # Higher score implies high buffer + frequent wallet velocity
         wallet_velocity_factor = min(1.0, total_wallet_tx / 40.0)
         wallet_surplus_factor = min(1.0, net_liquid_surplus / max(1.0, income * 0.4))
         wallet_cash_balance_proxy = round(0.5 * wallet_surplus_factor + 0.5 * wallet_velocity_factor, 3)
 
-        # 5. Dual Wallet Diversification (Both Easypaisa and JazzCash used)
         has_dual_wallet = 1 if (easypaisa_tx > 0 and jazzcash_tx > 0) else 0
 
-        # 6. Repayment Discipline Index [0.0 - 1.0]
         if loans_count > 0:
             repayment_discipline = (repayment_rate / 100.0) - (defaults_count * 0.35)
             repayment_discipline = max(0.0, min(1.0, repayment_discipline))
         else:
-            # Thin-file baseline
             repayment_discipline = 0.65 if cleaned["hasBankAccount"] == "Yes" else 0.50
 
-        # 7. Digital Footprint Score Index [0.0 - 1.0]
         recharge_ratio = min(1.0, recharge / max(500.0, income * 0.05))
         digital_footprint_index = round(
             (0.5 * wallet_velocity_factor) + (0.3 * recharge_ratio) + (0.2 * has_dual_wallet),
             3
         )
 
-        derived = {
+        return {
             "transaction_velocity_daily": transaction_velocity_daily,
             "transaction_velocity_weekly": transaction_velocity_weekly,
             "utility_delay_ratio": utility_delay_ratio,
@@ -322,24 +326,215 @@ class FeatureEngineeringService:
             "installment_to_income_ratio": installment_to_income_ratio,
             "estimated_monthly_installment_pkr": estimated_monthly_installment,
             "wallet_cash_balance_proxy": wallet_cash_balance_proxy,
-            "wallet_in_out_balance_ratio": balance_ratio,
+            "wallet_inflow_outflow_ratio": round(income / max(1.0, expenses + monthly_debt_service), 2),
             "has_dual_wallet": has_dual_wallet,
             "total_monthly_wallet_tx": total_wallet_tx,
             "repayment_discipline_index": round(repayment_discipline, 3),
             "digital_footprint_index": digital_footprint_index,
         }
 
-        return derived
+    @classmethod
+    def to_ml_feature_row(cls, features: Dict[str, Any]) -> pd.DataFrame:
+        """
+        Maps cleaned and derived borrower features into the exact 26 features
+        expected by Member 1's ML preprocessor and trained models.
+        """
+        # 1. Provider mapping (Must be one of "Easypaisa", "JazzCash", "SadaPay", "NayaPay")
+        direct_provider = features.get("provider")
+        if direct_provider in ["Easypaisa", "JazzCash", "SadaPay", "NayaPay"]:
+            provider = direct_provider
+        else:
+            ep_tx = features.get("monthlyEasypaisaTxCount", 0)
+            jc_tx = features.get("monthlyJazzCashTxCount", 0)
+            provider = "Easypaisa" if ep_tx > jc_tx else "JazzCash"
+
+        # 2. Occupation mapping (Verbatim categories trained in ML pipeline)
+        raw_occ = str(features.get("occupation", "")).lower().replace("-", "_").replace(" ", "_")
+        valid_ml_occupations = [
+            "small_shopkeeper",
+            "rickshaw_driver",
+            "delivery_rider",
+            "daily_wage_laborer",
+            "street_vendor",
+            "domestic_worker"
+        ]
+        if raw_occ in valid_ml_occupations:
+            occupation = raw_occ
+        elif any(k in raw_occ for k in ["shop", "retail", "merchant", "store", "business"]):
+            occupation = "small_shopkeeper"
+        elif any(k in raw_occ for k in ["rickshaw", "taxi", "driver", "cab", "ride"]):
+            occupation = "rickshaw_driver"
+        elif any(k in raw_occ for k in ["rider", "delivery", "courier"]):
+            occupation = "delivery_rider"
+        elif any(k in raw_occ for k in ["labor", "worker", "construction", "mechanic", "electrician"]):
+            occupation = "daily_wage_laborer"
+        elif any(k in raw_occ for k in ["vendor", "accessories", "seller", "hawker"]):
+            occupation = "street_vendor"
+        elif any(k in raw_occ for k in ["tailor", "domestic", "home", "maid"]):
+            occupation = "domestic_worker"
+        else:
+            occupation = "small_shopkeeper"
+
+        # 3. Base numeric features
+        ep_tx = float(features.get("monthlyEasypaisaTxCount", 0))
+        jc_tx = float(features.get("monthlyJazzCashTxCount", 0))
+        monthly_tx = ep_tx + jc_tx
+
+        wallet_txn_count_30d = float(features.get("wallet_txn_count_30d") or monthly_tx)
+        wallet_txn_count_90d = float(features.get("wallet_txn_count_90d") or (wallet_txn_count_30d * 3.0))
+        
+        wallet_active_days_ratio_90d = float(
+            features.get("wallet_active_days_ratio_90d") or 
+            min(1.0, max(0.15, wallet_txn_count_90d / 90.0))
+        )
+
+        wallet_days_since_last_txn = float(
+            features.get("wallet_days_since_last_txn") or 
+            max(1.0, min(30.0, round(30.0 / max(1.0, wallet_txn_count_30d), 1)))
+        )
+
+        wallet_topup_count_90d = float(
+            features.get("wallet_topup_count_90d") or 
+            max(1.0, round(wallet_txn_count_90d * 0.25, 1))
+        )
+
+        wallet_topup_avg_amount = float(
+            features.get("wallet_topup_avg_amount") or 
+            max(500.0, float(features.get("monthlyMobileRechargePKR") or 2500.0))
+        )
+
+        wallet_topup_frequency_per_month = float(
+            features.get("wallet_topup_frequency_per_month") or 
+            round(wallet_topup_count_90d / 3.0, 1)
+        )
+
+        wallet_bill_payment_count_90d = float(
+            features.get("wallet_bill_payment_count_90d") or 
+            (3.0 if features.get("monthlyUtilityBillPKR", 0) > 0 else 0.0)
+        )
+
+        wallet_bill_payment_share = float(
+            features.get("wallet_bill_payment_share") or 
+            round(wallet_bill_payment_count_90d / max(1.0, wallet_txn_count_90d), 3)
+        )
+
+        wallet_distinct_billers_90d = float(
+            features.get("wallet_distinct_billers_90d") or 
+            (2.0 if features.get("monthlyUtilityBillPKR", 0) > 0 else 0.0)
+        )
+
+        wallet_avg_balance = float(
+            features.get("wallet_avg_balance") or 
+            max(500.0, float(features.get("disposable_income_pkr", 15000.0) * 0.35))
+        )
+
+        wallet_inflow_outflow_ratio = float(
+            features.get("wallet_inflow_outflow_ratio") or 1.05
+        )
+
+        wallet_txn_amount_volatility = float(
+            features.get("wallet_txn_amount_volatility") or 0.40
+        )
+
+        # 4. Compute the 11 engineered features exactly matching ML training pipeline
+        recent_txn_activity_ratio = float(
+            features.get("recent_txn_activity_ratio") or 
+            min(1.0, max(0.0, wallet_txn_count_30d / max(1.0, wallet_txn_count_90d)))
+        )
+        recent_transaction_flag = int(wallet_days_since_last_txn <= 7)
+        txn_recency_score = float(1.0 / (1.0 + max(0.0, wallet_days_since_last_txn)))
+        topup_to_transaction_ratio = float(wallet_topup_count_90d / max(1.0, wallet_txn_count_90d))
+        
+        estimated_volume = wallet_topup_count_90d * wallet_topup_avg_amount
+        estimated_topup_volume_log = float(np.log1p(max(0.0, estimated_volume)))
+        
+        bill_payment_txn_ratio = float(wallet_bill_payment_count_90d / max(1.0, wallet_txn_count_90d))
+        biller_norm = min(1.0, max(0.0, wallet_distinct_billers_90d) / 5.0)
+        bill_payment_consistency = float(wallet_bill_payment_share * biller_norm)
+        
+        avg_balance_log = float(np.sign(wallet_avg_balance) * np.log1p(abs(wallet_avg_balance)))
+        cashflow_stress_flag = int(wallet_inflow_outflow_ratio < 0.8)
+        txn_volatility_log = float(np.log1p(max(0.0, wallet_txn_amount_volatility)))
+        
+        active_days = max(1.0, wallet_active_days_ratio_90d * 90.0)
+        transactions_per_active_day = float(wallet_txn_count_90d / active_days)
+
+        row_dict = {
+            "provider": provider,
+            "occupation": occupation,
+            "wallet_active_days_ratio_90d": wallet_active_days_ratio_90d,
+            "wallet_txn_count_90d": wallet_txn_count_90d,
+            "wallet_txn_count_30d": wallet_txn_count_30d,
+            "wallet_days_since_last_txn": wallet_days_since_last_txn,
+            "wallet_topup_count_90d": wallet_topup_count_90d,
+            "wallet_topup_avg_amount": wallet_topup_avg_amount,
+            "wallet_topup_frequency_per_month": wallet_topup_frequency_per_month,
+            "wallet_bill_payment_count_90d": wallet_bill_payment_count_90d,
+            "wallet_bill_payment_share": wallet_bill_payment_share,
+            "wallet_distinct_billers_90d": wallet_distinct_billers_90d,
+            "wallet_avg_balance": wallet_avg_balance,
+            "wallet_inflow_outflow_ratio": wallet_inflow_outflow_ratio,
+            "wallet_txn_amount_volatility": wallet_txn_amount_volatility,
+            "recent_txn_activity_ratio": recent_txn_activity_ratio,
+            "recent_transaction_flag": recent_transaction_flag,
+            "txn_recency_score": txn_recency_score,
+            "topup_to_transaction_ratio": topup_to_transaction_ratio,
+            "estimated_topup_volume_log": estimated_topup_volume_log,
+            "bill_payment_txn_ratio": bill_payment_txn_ratio,
+            "bill_payment_consistency": bill_payment_consistency,
+            "avg_balance_log": avg_balance_log,
+            "cashflow_stress_flag": cashflow_stress_flag,
+            "txn_volatility_log": txn_volatility_log,
+            "transactions_per_active_day": transactions_per_active_day,
+        }
+
+        return pd.DataFrame([row_dict])
+
+    @classmethod
+    def calculate_confidence_score(cls, raw: Dict[str, Any]) -> float:
+        """
+        Computes confidence score based on input completeness and verified proof documents.
+        """
+        score = 0.60  # Baseline confidence for valid core application
+        
+        # Financial profile completeness
+        if raw.get("monthlyIncomePKR", 0) > 0 and raw.get("monthlyExpensesPKR", 0) > 0:
+            score += 0.08
+        
+        # Mobile wallet signal depth
+        ep = raw.get("monthlyEasypaisaTxCount", 0)
+        jc = raw.get("monthlyJazzCashTxCount", 0)
+        if (ep + jc) >= 20:
+            score += 0.08
+        elif (ep + jc) > 0:
+            score += 0.04
+            
+        # Utility payment record presence
+        if raw.get("utilityBillOnTimeRate") is not None and raw.get("monthlyUtilityBillPKR", 0) > 0:
+            score += 0.08
+            
+        # Verified document uploads attached
+        docs = raw.get("supportingDocuments") or []
+        if len(docs) >= 2:
+            score += 0.10
+        elif len(docs) >= 1:
+            score += 0.05
+            
+        # Credit history & bank account presence
+        if raw.get("hasBankAccount") == "Yes" or raw.get("hasFormalCreditHistory") in ["Yes", "Limited"]:
+            score += 0.05
+
+        return round(min(0.98, score), 2)
 
     @classmethod
     def process_features(cls, borrower: Union[BorrowerInput, Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Complete pipeline: Ingests, validates, cleans, and computes derived metrics.
-        Returns a unified feature dictionary ready for the inference service.
+        Complete pipeline: Ingests, validates, cleans, computes derived metrics,
+        and attaches confidence metrics.
         """
         cleaned = cls.validate_and_clean_input(borrower)
         derived = cls.compute_derived_features(cleaned)
+        confidence = cls.calculate_confidence_score(cleaned)
 
-        # Merge cleaned input and derived features into one dictionary
-        processed = {**cleaned, **derived}
+        processed = {**cleaned, **derived, "confidence_score": confidence}
         return processed

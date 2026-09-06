@@ -23,7 +23,7 @@ class BorrowerInput(BaseModel):
                 "age": 28,
                 "city": "Lahore",
                 "province": "Punjab",
-                "occupation": "Textile Retailer",
+                "occupation": "small_shopkeeper",
                 "employmentType": "Small Business Owner",
                 "monthlyIncomePKR": 85000,
                 "monthlyExpensesPKR": 42000,
@@ -75,6 +75,30 @@ class BorrowerInput(BaseModel):
     traditionalCreditNotes: Optional[str] = Field(None, description="Optional notes on credit background")
     supportingDocuments: Optional[List[SupportingDocument]] = Field(default_factory=list, description="Uploaded proof documents")
 
+    # Optional direct alternative data fields from ML model schema
+    provider: Optional[str] = Field(None, description="Preferred alternative telecom wallet provider (Easypaisa, JazzCash, SadaPay, NayaPay)")
+    wallet_active_days_ratio_90d: Optional[float] = None
+    wallet_txn_count_90d: Optional[float] = None
+    wallet_txn_count_30d: Optional[float] = None
+    wallet_days_since_last_txn: Optional[float] = None
+    wallet_topup_count_90d: Optional[float] = None
+    wallet_topup_avg_amount: Optional[float] = None
+    wallet_topup_frequency_per_month: Optional[float] = None
+    wallet_bill_payment_count_90d: Optional[float] = None
+    wallet_bill_payment_share: Optional[float] = None
+    wallet_distinct_billers_90d: Optional[float] = None
+    wallet_avg_balance: Optional[float] = None
+    wallet_inflow_outflow_ratio: Optional[float] = None
+    wallet_txn_amount_volatility: Optional[float] = None
+
+
+class ShapExplanation(BaseModel):
+    feature_name: str = Field(..., description="Name of the model feature")
+    raw_value: Any = Field(..., description="Observed applicant value for this feature")
+    impact: float = Field(..., description="+/- points or log-odds impact on credit score")
+    direction: str = Field(..., description="'positive' (improves creditworthiness) or 'negative' (increases default risk)")
+    explanation: str = Field(..., description="Human-readable reason for feature contribution")
+
 
 class FeatureImportanceItem(BaseModel):
     featureName: str = Field(..., description="Internal Signal Name")
@@ -104,26 +128,41 @@ class ScoreBreakdown(BaseModel):
 
 
 class RiskAssessmentResponse(BaseModel):
+    # Step 3 Required Core Contract Fields
+    credit_score: int = Field(..., ge=300, le=850, description="Standard credit score scaled from 300 to 850")
+    risk_tier: str = Field(..., description="Risk tier: 'Low Risk', 'Medium Risk', or 'High Risk'")
+    default_probability: float = Field(..., ge=0.0, le=1.0, description="Predicted probability of default (0.0 to 1.0)")
+    confidence_score: float = Field(..., ge=0.0, le=1.0, description="Metric based on input completeness and verified proof (0.0 to 1.0)")
+    shap_explanations: List[ShapExplanation] = Field(..., description="Structured list containing feature names, raw values, and directional impacts")
+    recommendation: str = Field(..., description="Auto-generated underwriting action (e.g. Approve Micro-Loan, Manual Review, Decline)")
+
+    # Top drivers
+    top_positive_drivers: List[str] = Field(default_factory=list, description="Top 3 positive drivers (+ impact on score)")
+    top_negative_drivers: List[str] = Field(default_factory=list, description="Top 3 negative risk flags (- impact on score)")
+
+    # Backward-compatible fields for frontend UI components and previous steps
     borrowerId: Optional[str] = Field(None, description="Borrower Identifier")
-    fullName: str = Field(..., description="Borrower Full Name")
-    creditScore: int = Field(..., ge=0, le=100, description="Lendora Normalized Credit Score (0 - 100)")
-    scaledCreditScore: int = Field(..., ge=300, le=850, description="Scaled Standard Credit Score Equivalent (300 - 850)")
-    riskTier: str = Field(..., description="Risk Tier: 'low', 'moderate', 'elevated', or 'high'")
-    defaultRiskCategory: str = Field(..., description="Risk Level Classification")
-    estimatedDefaultProbability: float = Field(..., description="Estimated Probability of Default (%)")
-    recommendation: str = Field(..., description="Underwriting Recommendation (Approved, Approved with Conditions, Manual Review, Rejected)")
-    maxApprovedLoanAmountPKR: float = Field(..., description="Maximum Recommended Loan Capacity in PKR")
-    financialMetrics: FinancialMetrics = Field(..., description="Key Financial Ratios & Signal Indicators")
-    scoreBreakdown: ScoreBreakdown = Field(..., description="Detailed Component Sub-scores")
-    topPositiveDrivers: List[str] = Field(..., description="Top Key Positive Credit Signals")
-    topRiskDrivers: List[str] = Field(..., description="Top Key Risk Signals")
-    featureImportance: List[FeatureImportanceItem] = Field(..., description="Comprehensive Feature Importance & SHAP Factors")
-    modelTypeUsed: Optional[str] = Field("calibrated_heuristic", description="Underlying scoring engine: 'trained_ml_model' or 'calibrated_heuristic'")
+    fullName: str = Field("Anonymous Borrower", description="Borrower Full Name")
+    creditScore: Optional[int] = Field(None, description="Lendora Normalized Credit Score (0 - 100)")
+    scaledCreditScore: Optional[int] = Field(None, description="Scaled Standard Credit Score Equivalent (300 - 850)")
+    riskTier: Optional[str] = Field(None, description="Risk Tier ('low', 'moderate', 'elevated', 'high')")
+    defaultRiskCategory: Optional[str] = Field(None, description="Risk Level Classification")
+    estimatedDefaultProbability: Optional[float] = Field(None, description="Estimated Probability of Default (%)")
+    maxApprovedLoanAmountPKR: Optional[float] = Field(None, description="Maximum Recommended Loan Capacity in PKR")
+    financialMetrics: Optional[FinancialMetrics] = Field(None, description="Key Financial Ratios & Signal Indicators")
+    scoreBreakdown: Optional[ScoreBreakdown] = Field(None, description="Detailed Component Sub-scores")
+    topPositiveDrivers: Optional[List[str]] = Field(default_factory=list, description="Top Key Positive Credit Signals")
+    topRiskDrivers: Optional[List[str]] = Field(default_factory=list, description="Top Key Risk Signals")
+    featureImportance: Optional[List[FeatureImportanceItem]] = Field(default_factory=list, description="Comprehensive Feature Importance & SHAP Factors")
+    modelTypeUsed: Optional[str] = Field("trained_ml_model", description="Underlying scoring engine: 'trained_ml_model' or 'calibrated_heuristic'")
     derivedFeatures: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Raw engineered features passed to inference engine")
 
 
 class HealthResponse(BaseModel):
     status: str = Field("healthy", description="Service Operational Status")
     service: str = Field("Lendora Credit Scoring API", description="Service Name")
-    version: str = Field("1.0.0", description="API Version")
+    version: str = Field("3.0.0", description="API Version")
     environment: str = Field("development", description="Environment Mode")
+    model_loaded: bool = Field(True, description="Whether ML model artifact is loaded in memory")
+    model_used: Optional[str] = Field("lightgbm", description="Trained model architecture used")
+    explainer_ready: bool = Field(True, description="Whether SHAP explainer is ready for real-time explanations")

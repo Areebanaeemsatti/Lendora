@@ -222,6 +222,7 @@ export function UnderwriterDashboard({
           altCreditScore={selectedAppForShap.altCreditScore}
           baseScore={selectedAppForShap.baseScore ?? 520}
           shapFeatures={selectedAppForShap.shapFeatures ?? []}
+          shap_values={selectedAppForShap.shap_values ?? []}
         />
       )}
     </div>

@@ -28,6 +28,13 @@ runs real-time SHAP explainability to compute local feature contributions, and r
 * **top_negative_drivers**: Top 3 negative risk flags
 """
 )
+@router.post(
+    "/credit/score",
+    response_model=RiskAssessmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Assess Borrower Credit Risk with Trained ML Model & SHAP (Portal Endpoint)",
+    include_in_schema=True
+)
 async def assess_credit_score(borrower: BorrowerInput) -> RiskAssessmentResponse:
     try:
         assessment = ScoringService.calculate_score(borrower)

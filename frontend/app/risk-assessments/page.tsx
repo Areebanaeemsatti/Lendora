@@ -14,6 +14,7 @@ import { SupportingEvidenceCard } from '@/components/assessment/SupportingEviden
 import { AssessmentSummaryCard } from '@/components/assessment/AssessmentSummaryCard';
 import { DecisionSupportCard } from '@/components/assessment/DecisionSupportCard';
 import { ApplicationSwitcher } from '@/components/assessment/ApplicationSwitcher';
+import { ShapModal } from '@/components/ShapModal';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
@@ -30,6 +31,7 @@ function RiskAssessmentsContent() {
 
   const [currentApp, setCurrentApp] = useState<BorrowerApplication | null>(null);
   const [allApplications, setAllApplications] = useState<BorrowerApplication[]>([]);
+  const [shapModalOpen, setShapModalOpen] = useState(false);
 
   useEffect(() => {
     const stored = getAllStoredApplications();
@@ -98,7 +100,12 @@ function RiskAssessmentsContent() {
         {currentApp ? (
           <div className="space-y-6">
             <BorrowerOverviewCard application={currentApp} />
-            <AssessmentSummaryCard />
+            <AssessmentSummaryCard
+              application={currentApp}
+              assessment={currentApp.assessment}
+              selectedQueueItem={selectedQueueItem}
+              onOpenShapModal={() => setShapModalOpen(true)}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <FinancialProfileCard application={currentApp} />
               <AlternativeSignalsCard application={currentApp} />
@@ -112,17 +119,24 @@ function RiskAssessmentsContent() {
             />
           </div>
         ) : selectedQueueItem ? (
-          <Card className="p-6 border-emerald-200 bg-emerald-50/40">
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Selected queue record</p>
-            <h3 className="text-lg font-bold text-slate-900 mt-1">{selectedQueueItem.applicantName}</h3>
-            <p className="text-sm text-slate-600 mt-2">
-              Monthly income {formatPKR(selectedQueueItem.income)} · requested {formatPKR(selectedQueueItem.requestedAmount)} ·
-              alt score {selectedQueueItem.altCreditScore} ({selectedQueueItem.riskLevel} risk)
-            </p>
-            <p className="text-xs text-slate-500 mt-3">
-              Full scorecards appear for applications submitted through the borrower form. This seed record lives in the mock queue only.
-            </p>
-          </Card>
+          <div className="space-y-6">
+            <AssessmentSummaryCard
+              selectedQueueItem={selectedQueueItem}
+              assessment={selectedQueueItem.assessment}
+              onOpenShapModal={() => setShapModalOpen(true)}
+            />
+            <Card className="p-6 border-emerald-200 bg-emerald-50/40">
+              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Selected queue record</p>
+              <h3 className="text-lg font-bold text-slate-900 mt-1">{selectedQueueItem.applicantName}</h3>
+              <p className="text-sm text-slate-600 mt-2">
+                Monthly income {formatPKR(selectedQueueItem.income)} · requested {formatPKR(selectedQueueItem.requestedAmount)} ·
+                alt score {selectedQueueItem.altCreditScore} ({selectedQueueItem.riskLevel} risk)
+              </p>
+              <p className="text-xs text-slate-500 mt-3">
+                Full scorecards appear for applications submitted through the borrower form. This seed record lives in the mock queue only.
+              </p>
+            </Card>
+          </div>
         ) : (
           <Card className="p-12 text-center">
             <div className="max-w-md mx-auto space-y-4">
@@ -141,6 +155,23 @@ function RiskAssessmentsContent() {
             </div>
           </Card>
         )}
+
+        {/* Live SHAP Explainability Decomposition Modal */}
+        <ShapModal
+          isOpen={shapModalOpen}
+          onClose={() => setShapModalOpen(false)}
+          applicantName={currentApp?.fullName || selectedQueueItem?.applicantName || 'Borrower'}
+          altCreditScore={currentApp?.assessment?.credit_score ?? selectedQueueItem?.altCreditScore ?? 742}
+          baseScore={selectedQueueItem?.baseScore ?? 520}
+          shap_values={
+            currentApp?.shap_values && currentApp.shap_values.length > 0
+              ? currentApp.shap_values
+              : (currentApp?.assessment?.shap_values && currentApp.assessment.shap_values.length > 0
+                ? currentApp.assessment.shap_values
+                : (selectedQueueItem?.shap_values ?? []))
+          }
+          shapFeatures={selectedQueueItem?.shapFeatures ?? []}
+        />
       </div>
     </AppLayout>
   );

@@ -15,13 +15,13 @@ from services.inference_service import InferenceService
 
 
 def _get_csv_path() -> Path:
-    """Resolve the path to lendora_demo_borrowers_50.csv regardless of current working dir."""
+    """Resolve the path to ml/data/pk_alt_data_synthetic3.csv regardless of current working dir."""
     current_file_dir = Path(__file__).resolve().parent
     path_candidates = [
-        current_file_dir.parent.parent / "data" / "lendora_demo_borrowers_50.csv",
-        Path("data/lendora_demo_borrowers_50.csv"),
-        Path("../data/lendora_demo_borrowers_50.csv"),
-        Path("../../data/lendora_demo_borrowers_50.csv"),
+        current_file_dir.parent.parent / "ml" / "data" / "pk_alt_data_synthetic3.csv",
+        Path("ml/data/pk_alt_data_synthetic3.csv"),
+        Path("../ml/data/pk_alt_data_synthetic3.csv"),
+        Path("../../ml/data/pk_alt_data_synthetic3.csv"),
     ]
     for p in path_candidates:
         if p.exists():
@@ -94,6 +94,17 @@ class ScoringService:
             default_probability=pred["default_probability"],
             confidence_score=pred["confidence_score"],
             shap_explanations=shap_explanations_list,
+            shap_values=[
+                {
+                    "feature_name": exp.feature_name,
+                    "featureName": exp.feature_name,
+                    "raw_value": exp.raw_value,
+                    "impact": exp.impact,
+                    "direction": exp.direction,
+                    "explanation": exp.explanation,
+                }
+                for exp in shap_explanations_list
+            ],
             recommendation=pred["recommendation"],
             top_positive_drivers=top_pos,
             top_negative_drivers=top_neg,
@@ -141,20 +152,56 @@ class ScoringService:
     @staticmethod
     def get_sample_borrowers(limit: int = 5) -> List[Dict[str, Any]]:
         """
-        Reads sample borrower profiles directly from the CSV dataset.
+        Reads sample borrower profiles directly from ml/data/pk_alt_data_synthetic3.csv.
         """
         csv_path = _get_csv_path()
         if not csv_path.exists():
-            raise FileNotFoundError(f"Mock dataset CSV file not found at: {csv_path}")
+            raise FileNotFoundError(f"Dataset CSV file not found at: {csv_path}")
 
         df = pd.read_csv(csv_path)
         sample_df = df.head(limit)
-        sample_df = sample_df.fillna({
-            "borrowerId": "LND-DEMO-000",
-            "fullName": "Sample Borrower",
-            "existingDebtPKR": 0,
-            "previousDefaultsCount": 0
-        })
 
-        records = sample_df.to_dict(orient="records")
+        records = []
+        for _, row in sample_df.iterrows():
+            d = row.to_dict()
+            borrower_id = str(d.get("borrower_id", d.get("borrowerId", "PK000000")))
+            provider = str(d.get("provider", "Easypaisa"))
+            occ = str(d.get("occupation", "informal_worker"))
+            occ_display = occ.replace("_", " ").title()
+
+            tx_90d = float(d.get("wallet_txn_count_90d", 30))
+            monthly_tx = max(5, int(round(tx_90d / 3.0)))
+            bill_count = int(d.get("wallet_bill_payment_count_90d", 2))
+            is_default = int(d.get("default_label", 0))
+
+            income = 95000 if occ == "small_shopkeeper" else (70000 if occ in ["delivery_rider", "rickshaw_driver"] else 55000)
+            expenses = int(income * 0.55)
+            requested_loan = 200000 if occ == "small_shopkeeper" else (120000 if occ in ["delivery_rider", "rickshaw_driver"] else 80000)
+            on_time_rate = 95 if is_default == 0 else 65
+
+            item = {
+                **d,
+                "borrowerId": borrower_id,
+                "fullName": f"Borrower {borrower_id} ({occ_display})",
+                "city": "Lahore" if ("0" in borrower_id or "2" in borrower_id) else "Karachi",
+                "province": "Punjab" if ("0" in borrower_id or "2" in borrower_id) else "Sindh",
+                "occupation": occ,
+                "employmentType": occ_display,
+                "monthlyIncomePKR": income,
+                "monthlyExpensesPKR": expenses,
+                "existingDebtPKR": 5000 if is_default == 0 else 25000,
+                "requestedLoanAmountPKR": requested_loan,
+                "loanTermMonths": 12,
+                "monthlyEasypaisaTxCount": monthly_tx if provider == "Easypaisa" else int(monthly_tx * 0.3),
+                "monthlyJazzCashTxCount": monthly_tx if provider == "JazzCash" else int(monthly_tx * 0.7),
+                "monthlyMobileRechargePKR": int(float(d.get("wallet_topup_avg_amount", 120)) * 12),
+                "utilityBillOnTimeRate": min(100, max(50, 75 + bill_count * 4)),
+                "monthlyUtilityBillPKR": 7500,
+                "previousLoansCount": 2 if is_default == 0 else 1,
+                "previousDefaultsCount": is_default,
+                "onTimeRepaymentRate": on_time_rate,
+                "avgPreviousLoanAmountPKR": 60000,
+                "repaymentHistoryGrade": "Good" if is_default == 0 else "Poor",
+            }
+            records.append(item)
         return records

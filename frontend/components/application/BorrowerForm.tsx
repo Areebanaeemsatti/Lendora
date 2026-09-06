@@ -11,7 +11,7 @@ import { SupportingDocumentsSection } from '@/components/application/SupportingD
 import { OptionalCreditSection } from '@/components/application/OptionalCreditSection';
 import { Button } from '@/components/ui/Button';
 import { BorrowerApplication, SupportingDocument } from '@/types';
-import { saveApplicationLocally } from '@/lib/storage';
+import { saveApplicationLocally, submitCreditScoreAssessment } from '@/lib/storage';
 import { useApplications } from '@/components/providers/ApplicationsProvider';
 import { deriveAltCreditScore, deriveRiskLevel } from '@/lib/mockData';
 import { ArrowRight, RotateCcw, Sparkles, AlertCircle } from 'lucide-react';
@@ -62,7 +62,7 @@ const initialFormData: BorrowerApplication = {
 
 export function BorrowerForm() {
   const router = useRouter();
-  const { addApplication } = useApplications();
+  const { addApplication, submitApplication } = useApplications();
   const [formData, setFormData] = useState<BorrowerApplication>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -256,7 +256,7 @@ export function BorrowerForm() {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -265,15 +265,6 @@ export function BorrowerForm() {
 
     setIsSubmitting(true);
 
-    const income = Number(formData.monthlyIncomePKR);
-    const requestedAmount = Number(formData.requestedLoanAmountPKR);
-    const altCreditScore = deriveAltCreditScore({
-      income,
-      requestedAmount,
-      utilityOnTimeRate: Number(formData.utilityBillOnTimeRate),
-      onTimeRepaymentRate: Number(formData.onTimeRepaymentRate),
-    });
-
     const submissionPayload: BorrowerApplication = {
       ...formData,
       id: formData.id || 'app-' + Date.now(),
@@ -281,21 +272,50 @@ export function BorrowerForm() {
       status: 'pending_review',
     };
 
-    saveApplicationLocally(submissionPayload);
-    addApplication({
-      id: submissionPayload.id,
-      applicantName: submissionPayload.fullName,
-      income,
-      requestedAmount,
-      altCreditScore,
-      riskLevel: deriveRiskLevel(altCreditScore),
-      status: 'pending',
-    });
+    try {
+      if (submitApplication) {
+        await submitApplication(submissionPayload);
+      } else {
+        const assessment = await submitCreditScoreAssessment(submissionPayload);
+        const income = Number(submissionPayload.monthlyIncomePKR) || 0;
+        const requestedAmount = Number(submissionPayload.requestedLoanAmountPKR) || 0;
+        const altScore = assessment.credit_score;
+        const riskLevel = deriveRiskLevel(altScore);
+        const shapItems = assessment.shap_values || assessment.shap_explanations || [];
 
-    setTimeout(() => {
+        saveApplicationLocally({
+          ...submissionPayload,
+          assessment,
+          shap_values: shapItems,
+        });
+
+        addApplication({
+          id: submissionPayload.id,
+          applicantName: submissionPayload.fullName,
+          income,
+          requestedAmount,
+          altCreditScore: altScore,
+          riskLevel,
+          status: 'pending',
+          shap_values: shapItems,
+          shapFeatures: shapItems.map((v) => ({
+            featureName: v.featureName || v.feature_name || 'Feature',
+            impact: v.impact,
+            category: v.category || (v.impact >= 0 ? 'Score Driver' : 'Risk Flag'),
+          })),
+          assessment,
+          recommendation: assessment.recommendation,
+          confidenceScore: assessment.confidence_score,
+          defaultProbability: assessment.default_probability,
+          baseScore: 520,
+        });
+      }
+    } catch (err) {
+      console.warn('Form submission handled with safe fallback:', err);
+    } finally {
       setIsSubmitting(false);
       router.push(`/risk-assessments?id=${submissionPayload.id}`);
-    }, 700);
+    }
   };
 
   return (

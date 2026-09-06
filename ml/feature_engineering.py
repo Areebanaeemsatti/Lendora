@@ -43,7 +43,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         "wallet_bill_payment_count_90d",
         "wallet_bill_payment_share",
         "wallet_distinct_billers_90d",
-        "wallet_avg_balance",
         "wallet_inflow_outflow_ratio",
         "wallet_txn_amount_volatility",
     ]
@@ -182,14 +181,10 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     # ---------------------------------------------------------
 
     if "wallet_avg_balance" in df.columns:
-
-        df["avg_balance_log"] = np.log1p(
-            df["wallet_avg_balance"].clip(lower=0)
-        )
-
-        df["low_balance_flag"] = (
-            df["wallet_avg_balance"] <= 0
-        ).astype(int)
+      df["avg_balance_log"] = np.sign(df["wallet_avg_balance"]) * np.log1p(
+        df["wallet_avg_balance"].abs()
+      )
+      df["low_balance_flag"] = (df["wallet_avg_balance"] <= 0).astype(int)
 
     # ---------------------------------------------------------
     # 6. Cash-flow behaviour

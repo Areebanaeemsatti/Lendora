@@ -739,6 +739,34 @@ def train_and_evaluate() -> dict:
     )
 
     # --------------------------------------------------------
+    # 13b. SAVE SHAP BACKGROUND SAMPLE
+    #
+    # SHAP explains a prediction relative to a background
+    # distribution ("what's typical"), not relative to itself.
+    # We save a small transformed sample of the TRAINING data
+    # here so model.py can build a correct explainer at
+    # inference time, instead of (incorrectly) using the single
+    # row being predicted as its own background.
+    # --------------------------------------------------------
+
+    background_sample_size = min(100, len(X_train))
+
+    background_raw = X_train.sample(
+        n=background_sample_size,
+        random_state=42,
+    )
+
+    background_transformed = preprocessor.transform(
+        background_raw
+    )
+
+    joblib.dump(
+        background_transformed,
+        ARTIFACT_DIR
+        / "shap_background.joblib",
+    )
+
+    # --------------------------------------------------------
     # 14. SAVE THRESHOLD
     # --------------------------------------------------------
 

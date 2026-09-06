@@ -96,18 +96,34 @@ class _BaseMockProvider(WalletProvider):
 
 
 class EasypaisaMockProvider(_BaseMockProvider):
-    name = "easypaisa"
+    # NOTE: `name` is used as the display/canonical provider string.
+    # It must match the training CSV's category value exactly
+    # ("Easypaisa", not "easypaisa") so it round-trips correctly
+    # through schemas.py -> model.py -> the fitted OneHotEncoder.
+    name = "Easypaisa"
     reference_prefix = "EP"
 
 
 class JazzCashMockProvider(_BaseMockProvider):
-    name = "jazzcash"
+    name = "JazzCash"
     reference_prefix = "JC"
+
+
+class SadaPayMockProvider(_BaseMockProvider):
+    name = "SadaPay"
+    reference_prefix = "SP"
+
+
+class NayaPayMockProvider(_BaseMockProvider):
+    name = "NayaPay"
+    reference_prefix = "NP"
 
 
 _PROVIDERS: dict[str, WalletProvider] = {
     "easypaisa": EasypaisaMockProvider(),
     "jazzcash": JazzCashMockProvider(),
+    "sadapay": SadaPayMockProvider(),
+    "nayapay": NayaPayMockProvider(),
 }
 
 

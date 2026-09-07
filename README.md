@@ -165,3 +165,78 @@ The application includes:
                  │ Underwriter         │
                  │ Dashboard           │
                  └─────────────────────┘
+
+```
+# 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| **Next.js 15** | Application framework |
+| **React 19** | User interface |
+| **TypeScript** | Type-safe development |
+| **Tailwind CSS** | Styling and responsive UI |
+| **Lucide React** | Interface icons |
+| **Vercel** | Deployment |
+| **GitHub** | Version control |
+
+---
+
+# 📁 Project Structure
+
+```text
+Lendora/
+│
+├── frontend/
+│   │
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── risk-assessments/
+│   │   │   │   └── # Risk Dashboard & SHAP Inspection
+│   │   │   │
+│   │   │   ├── new-application/
+│   │   │   │   └── # Borrower Application
+│   │   │   │
+│   │   │   ├── dashboard/
+│   │   │   │   └── # Analytics & Overview
+│   │   │   │
+│   │   │   └── auth/
+│   │   │       └── # Authentication
+│   │   │
+│   │   ├── components/
+│   │   │   └── # Reusable UI Components
+│   │   │
+│   │   ├── lib/
+│   │   │   └── # Utilities & Data Layer
+│   │   │
+│   │   └── types/
+│   │       └── # TypeScript Models
+│   │
+│   ├── public/
+│   │   └── # Static Assets
+│   │
+│   ├── package.json
+│   └── README.md
+│
+└── LICENSE
+
+
+```
+# 🚀 Getting Started
+
+## Prerequisites
+
+Make sure you have installed:
+
+- Node.js 20+
+- npm
+- Git
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/Areebanaeemsatti/Lendora.git
+cd Lendora/frontend
+
+
+```
+

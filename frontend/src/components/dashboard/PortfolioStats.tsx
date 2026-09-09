@@ -23,11 +23,11 @@ export function PortfolioStats() {
 
     return [
       {
-        title: 'Total Applications',
+        title: 'Total Applicants',
         value: String(applications.length),
-        subtext: 'Active queue',
+        subtext: 'Applications submitted',
         trend: 'up' as const,
-        trendValue: `${applications.filter((app) => app.status === 'pending').length} pending`,
+        trendValue: `${applications.filter((app) => app.status === 'pending').length} awaiting decision`,
         icon: <FileText className="w-4 h-4 text-zinc-400" />,
       },
       {
@@ -35,7 +35,7 @@ export function PortfolioStats() {
         value: formatPKR(volume),
         subtext: 'Total approved PKR',
         trend: 'up' as const,
-        trendValue: `${approved.length} approved`,
+        trendValue: `${approved.length} loans approved`,
         icon: <Banknote className="w-4 h-4 text-emerald-400" />,
       },
       {
@@ -43,18 +43,19 @@ export function PortfolioStats() {
         value: `${approvalRate}%`,
         subtext: 'Of submitted applications',
         trend: 'neutral' as const,
-        trendValue: 'Local state',
+        trendValue: 'Active portfolio',
         icon: <TrendingUp className="w-4 h-4 text-sky-400" />,
       },
       {
-        title: 'Avg AI Credit Score',
+        title: 'Average Credit Score',
         value: String(avgScore),
-        subtext: 'Alternative credit median',
+        subtext: 'Score across applicants',
         trend: 'up' as const,
-        trendValue: 'AI median score',
+        trendValue: 'Calibrated score',
         icon: <ShieldCheck className="w-4 h-4 text-teal-400" />,
       },
     ];
+
   }, [applications]);
 
   return (

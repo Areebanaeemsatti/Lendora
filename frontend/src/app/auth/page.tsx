@@ -75,11 +75,11 @@ export default function AuthPage() {
       <div className="w-full max-w-md bg-zinc-900/60 border border-zinc-800 rounded-2xl p-8 space-y-6 shadow-2xl">
         <div className="space-y-2">
           <div className="inline-block bg-emerald-500/10 text-[#05C168] text-xs font-mono font-semibold px-2.5 py-1 rounded-full border border-emerald-500/20">
-            LENDORA AUTHENTICATION
+            LENDORA
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Sign in to Desk</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Sign In</h1>
           <p className="text-sm text-zinc-400">
-            Enter your Pakistani CNIC or Mobile Number to access underwriting scores.
+            Enter your CNIC or Mobile Number to access the loan review dashboard.
           </p>
         </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ApplicationsProvider } from "@/components/providers/ApplicationsProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,8 +29,11 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased min-h-full bg-zinc-950 text-zinc-100`}
       >
-        <ApplicationsProvider>{children}</ApplicationsProvider>
+        <ToastProvider>
+          <ApplicationsProvider>{children}</ApplicationsProvider>
+        </ToastProvider>
       </body>
     </html>
   );
 }
+

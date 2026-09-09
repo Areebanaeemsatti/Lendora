@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { X, TrendingUp, TrendingDown, Scale, Sparkles, CheckCircle2, AlertTriangle } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { X, TrendingUp, TrendingDown, Scale, Sparkles, CheckCircle2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,18 @@ export function ShapModal({
   shapFeatures = [],
   shap_values = [],
 }: ShapModalProps) {
-  if (!isOpen) return null;
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Handle ESC key press to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Normalize incoming SHAP inputs whether provided via shap_values or legacy shapFeatures
   const normalizedFeatures = useMemo(() => {
@@ -61,6 +72,17 @@ export function ShapModal({
     });
   }, [shap_values, shapFeatures]);
 
+  const filteredFeatures = useMemo(() => {
+    if (!searchTerm.trim()) return normalizedFeatures;
+    const term = searchTerm.toLowerCase();
+    return normalizedFeatures.filter(
+      (f) =>
+        f.featureName.toLowerCase().includes(term) ||
+        f.category.toLowerCase().includes(term) ||
+        f.explanation.toLowerCase().includes(term)
+    );
+  }, [normalizedFeatures, searchTerm]);
+
   const positiveFeatures = normalizedFeatures.filter((f) => f.impact > 0 || f.isPositive);
   const negativeFeatures = normalizedFeatures.filter((f) => f.impact < 0 || !f.isPositive);
 
@@ -76,8 +98,15 @@ export function ShapModal({
     1
   );
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="shap-modal-title"
+    >
       <Card className="w-full max-w-2xl max-h-[92vh] flex flex-col bg-zinc-900 border-zinc-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <CardHeader className="bg-zinc-950 border-b border-zinc-800 px-6 py-4 shrink-0">
           <div className="flex items-center justify-between">
@@ -87,12 +116,12 @@ export function ShapModal({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-white text-lg font-bold">
-                    SHAP Credit Score Explainability
+                  <CardTitle id="shap-modal-title" className="text-white text-lg font-bold">
+                    Why This Score Was Given
                   </CardTitle>
                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Live ML Attribution
+                    Live Score Breakdown
                   </span>
                 </div>
                 <p className="text-zinc-400 text-xs mt-0.5">{applicantName}</p>
@@ -104,6 +133,7 @@ export function ShapModal({
               size="icon"
               onClick={onClose}
               className="text-zinc-400 hover:text-white hover:bg-zinc-800"
+              aria-label="Close SHAP modal"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -114,46 +144,60 @@ export function ShapModal({
           {/* Score Summary Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-zinc-800/60 rounded-xl p-4 border border-zinc-700/60 flex flex-col justify-between">
-              <p className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Base Population Score</p>
+              <p className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Starting Score</p>
               <div className="my-1.5">
                 <p className="text-2xl sm:text-3xl font-bold font-mono text-zinc-200">{baseScore}</p>
               </div>
-              <p className="text-[10px] text-zinc-400">Baseline prior before features</p>
+              <p className="text-[10px] text-zinc-400">Before any personal factors were considered</p>
             </div>
 
             <div className="bg-zinc-800/60 rounded-xl p-4 border border-zinc-700/60 flex flex-col justify-between">
-              <p className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Total SHAP Drivers</p>
+              <p className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Score Adjustments</p>
               <div className="my-1.5 flex items-center gap-2">
                 <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-400">+{totalPositive}</span>
                 <span className="text-zinc-400 font-bold">/</span>
                 <span className="text-xl sm:text-2xl font-bold font-mono text-rose-400">-{totalNegative}</span>
               </div>
-              <p className="text-[10px] text-zinc-400">Cumulative points adjustment</p>
+              <p className="text-[10px] text-zinc-400">Points added or removed based on your information</p>
             </div>
 
             <div className="bg-emerald-950/40 rounded-xl p-4 border border-emerald-700/50 flex flex-col justify-between shadow-inner">
-              <p className="text-[11px] text-emerald-400 font-semibold uppercase tracking-wider">Final Alt Credit Score</p>
+              <p className="text-[11px] text-emerald-400 font-semibold uppercase tracking-wider">Final Credit Score</p>
               <div className="my-1.5">
                 <p className="text-2xl sm:text-3xl font-bold font-mono text-emerald-300">{altCreditScore}</p>
               </div>
-              <p className="text-[10px] text-emerald-400 font-medium">Calibrated (300 to 850)</p>
+              <p className="text-[10px] text-emerald-400 font-medium">Score range: 300 (low) to 850 (excellent)</p>
             </div>
           </div>
 
           {/* Feature Impact Bars */}
           <div className="space-y-3.5">
-            <div className="flex items-center justify-between pb-1 border-b border-zinc-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-zinc-800">
               <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-400" />
-                Live Feature Contribution Visualizer
+                Things That Affected This Score
               </h3>
-              <span className="text-xs text-zinc-400">
-                {normalizedFeatures.length} evaluated signals
-              </span>
+              
+              {/* Feature Search */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                <input
+                  type="text"
+                  placeholder="Search factors..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-zinc-950 border border-zinc-800 rounded-md pl-8 pr-2 py-1 text-xs text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+              </div>
             </div>
 
             <div className="space-y-3">
-              {normalizedFeatures.map((feature, idx) => {
+              {filteredFeatures.length === 0 && (
+                <div className="p-8 text-center text-xs text-zinc-400 bg-zinc-950/40 rounded-xl border border-zinc-800">
+                  No factors match "{searchTerm}".
+                </div>
+              )}
+              {filteredFeatures.map((feature, idx) => {
                 const isPositive = feature.isPositive || feature.impact >= 0;
                 const impactPercent = Math.min(100, Math.max(8, (Math.abs(feature.impact) / maxImpact) * 100));
 
@@ -229,11 +273,11 @@ export function ShapModal({
           <div className="p-4 bg-zinc-950/60 rounded-xl border border-zinc-800 text-xs text-zinc-400 space-y-1.5">
             <div className="flex items-center gap-2 text-zinc-300 font-semibold">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Interpreting SHAP Alternative Scoring Weights</span>
+              <span>How to Read This Breakdown</span>
             </div>
             <p className="leading-relaxed">
-              <strong className="text-emerald-400">Emerald indicators</strong> indicate positive feature attributions that elevate the borrower score, reflecting dependable mobile wallet flow and utility discipline.
-              <strong className="text-rose-400"> Red/amber indicators</strong> signal risk deductions based on thin formal credit records or high leverage.
+              <strong className="text-emerald-400">Green bars</strong> show things that helped the score — like paying bills on time and regular mobile payments.
+              <strong className="text-rose-400"> Red bars</strong> show things that lowered the score — like missing payments or having a high loan amount compared to income.
             </p>
           </div>
         </CardContent>
@@ -247,3 +291,4 @@ export function ShapModal({
     </div>
   );
 }
+

@@ -108,12 +108,12 @@ export function AssessmentSummaryCard({
           {isLive ? (
             <>
               <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>FastAPI Machine Learning Inference &amp; Real SHAP TreeExplainer Active</span>
+              <span>Smart Credit Score Analysis Active</span>
             </>
           ) : (
             <>
               <Info className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Underwriting Scorecard — Local Inference Engine Active</span>
+              <span>Applicant Risk Check — Local Analysis Active</span>
             </>
           )}
         </div>
@@ -127,7 +127,7 @@ export function AssessmentSummaryCard({
               leftIcon={<Scale className="w-3.5 h-3.5 text-emerald-400" />}
               className="h-6 text-[11px] px-2"
             >
-              Inspect SHAP Visualizer
+              Why this score was given
             </Button>
           )}
           <span
@@ -138,7 +138,7 @@ export function AssessmentSummaryCard({
                 : 'text-amber-300 bg-amber-500/10 border-amber-500/25'
             )}
           >
-            {isLive ? 'Live Model Output' : 'Calibrated Engine'}
+            {isLive ? 'Live Analysis' : 'Standard Baseline'}
           </span>
         </div>
       </div>
@@ -147,19 +147,19 @@ export function AssessmentSummaryCard({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <CardTitle>Informal Creditworthiness Scorecard</CardTitle>
+            <CardTitle>Credit Score Summary</CardTitle>
           </div>
           <div className="flex items-center gap-2">
             {liveAssessment?.recommendation && (
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
-                Action: {liveAssessment.recommendation}
+                Recommendation: {liveAssessment.recommendation}
               </span>
             )}
-            <Badge variant="outline">Decision Support</Badge>
+            <Badge variant="outline">Applicant Summary</Badge>
           </div>
         </div>
         <CardDescription>
-          Explainable AI risk assessment evaluating alternative digital financial telemetry and repayment behavior
+          Easy-to-understand breakdown of this applicant's credit score, risk level, and key financial signals
         </CardDescription>
       </CardHeader>
 
@@ -168,7 +168,7 @@ export function AssessmentSummaryCard({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-lg bg-zinc-950/80 text-zinc-100 border border-zinc-800">
           <div className="sm:col-span-2 space-y-2">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
-              Calibrated Credit Score
+              Applicant Credit Score
             </span>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl sm:text-5xl font-bold font-mono text-white tracking-tight">
@@ -195,13 +195,13 @@ export function AssessmentSummaryCard({
 
           <div className="flex flex-col justify-center sm:border-l sm:border-zinc-800 sm:pl-4 space-y-1">
             <span className="text-[11px] font-semibold text-zinc-400 uppercase">
-              Predicted Default Probability
+              Estimated Risk Rating
             </span>
             <span className="text-2xl sm:text-3xl font-bold font-mono text-emerald-400">
               {defaultRisk}
             </span>
             <span className="text-[10px] text-zinc-400">
-              {isLive ? 'TreeExplainer calibrated baseline' : 'Baseline demographic benchmark'}
+              {isLive ? 'Based on live smart analysis' : 'Based on historical applicant data'}
             </span>
           </div>
         </div>
@@ -213,10 +213,10 @@ export function AssessmentSummaryCard({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Positive Score Drivers (Emerald Indicators)</span>
+                <span>Things helping the score (+ points)</span>
               </div>
               <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
-                + Score Impact
+                + Score Boosts
               </span>
             </div>
             <ul className="space-y-2 text-xs text-emerald-200">
@@ -234,10 +234,10 @@ export function AssessmentSummaryCard({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-rose-300">
                 <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                <span>Negative Risk Drivers (Red / Amber Indicators)</span>
+                <span>Things lowering the score (risk factors)</span>
               </div>
               <span className="text-[10px] font-semibold text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/25">
-                - Risk Penalty
+                - Risk Penalties
               </span>
             </div>
             <ul className="space-y-2 text-xs text-rose-200">
@@ -251,6 +251,7 @@ export function AssessmentSummaryCard({
           </div>
         </div>
 
+
         {/* Live SHAP Visualizer Preview */}
         {shapList.length > 0 && (
           <div className="p-4 rounded-xl bg-zinc-900 text-white border border-zinc-800 space-y-3">
@@ -258,7 +259,7 @@ export function AssessmentSummaryCard({
               <div className="flex items-center gap-2">
                 <Scale className="w-4 h-4 text-emerald-400" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-200">
-                  SHAP Explainability Visualizer Preview
+                  Key Influencing Factors
                 </h4>
               </div>
               {onOpenShapModal && (

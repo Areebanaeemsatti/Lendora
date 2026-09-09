@@ -4,8 +4,9 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { title: 'Dashboard', href: '/dashboard' },
-  { title: 'New Application', href: '/new-application' },
-  { title: 'Risk Assessments', href: '/risk-assessments' },
-  { title: 'Telecom / Utility', href: '/telecom-feed' },
+  { title: 'Overview', href: '/dashboard' },
+  { title: 'New Applicant', href: '/new-application' },
+  { title: 'Loan Risk Checks', href: '/risk-assessments' },
+  { title: 'Payment History Feed', href: '/telecom-feed' },
 ];
+

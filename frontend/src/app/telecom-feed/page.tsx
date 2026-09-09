@@ -183,6 +183,7 @@ function formatPKR(amount: number): string {
 
 function TelecomFeedContent() {
   const [filter, setFilter] = useState<FeedStatus | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const stats = {
     totalFeeds: mockTelecomFeeds.length,
@@ -193,27 +194,35 @@ function TelecomFeedContent() {
     disconnectedCount: mockTelecomFeeds.filter(f => f.status === 'disconnected').length,
   };
 
-  const filteredFeeds = filter === 'all' 
-    ? mockTelecomFeeds 
-    : mockTelecomFeeds.filter(feed => feed.status === filter);
+  const filteredFeeds = mockTelecomFeeds.filter((feed) => {
+    const matchesStatus = filter === 'all' || feed.status === filter;
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      feed.provider.toLowerCase().includes(q) ||
+      feed.businessName.toLowerCase().includes(q) ||
+      feed.accountNumber.toLowerCase().includes(q) ||
+      feed.dataPoint.toLowerCase().includes(q);
+    return matchesStatus && matchesSearch;
+  });
 
   return (
     <AppLayout>
       <div className="space-y-6 max-w-7xl mx-auto pb-16">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-800/80 bg-zinc-900/60 rounded-xl p-4">
           <div>
             <div className="flex items-center gap-2">
               <Signal className="w-4 h-4 text-emerald-400" />
-              <h2 className="text-lg font-semibold text-zinc-100 tracking-tight">
-                SME Telecom/Utility Feed
+              <h2 className="text-lg font-bold text-zinc-100 tracking-tight">
+                Payment History Feed
               </h2>
               <Badge variant="emerald" dot>
                 Live Monitoring
               </Badge>
             </div>
-            <p className="text-xs text-zinc-500 mt-1">
-              Real-time alternative data feeds from utility providers, telecom operators, and mobile wallet services for SME credit assessment.
+            <p className="text-xs text-zinc-400 mt-1">
+              Live payment records from utility companies, phone networks, and mobile payment services — used to check how reliably applicants pay their bills.
             </p>
           </div>
         </div>
@@ -221,32 +230,32 @@ function TelecomFeedContent() {
         {/* Summary Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
-            label="Total Feeds Active"
+            label="Active Records"
             value={String(stats.totalFeeds)}
             icon={Activity}
             color="emerald"
-            description="Data points monitored"
+            description="Payment records being tracked"
           />
           <MetricCard
-            label="Data Reliability Score"
+            label="Overall Payment Score"
             value={`${stats.dataReliabilityScore}%`}
             icon={TrendingUp}
             color="teal"
-            description="Feed accuracy rate"
+            description="How reliably bills are paid"
           />
           <MetricCard
-            label="Avg Utility Delay Days"
+            label="Average Payment Delay"
             value={`${stats.avgUtilityDelayDays}d`}
             icon={Clock}
             color="amber"
-            description="Payment latency"
+            description="How many days late on average"
           />
           <MetricCard
-            label="Verified Payments"
+            label="On-Time Payments"
             value={`${stats.verifiedCount}/${stats.totalFeeds}`}
             icon={CheckCircle}
             color="sky"
-            description="On-time rate"
+            description="Paid on or before due date"
           />
         </div>
 
@@ -255,51 +264,64 @@ function TelecomFeedContent() {
           <CardHeader className="bg-zinc-950 text-zinc-100 border-b border-zinc-800/80">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
-                <CardTitle className="text-zinc-100">Live Data Feed Monitor</CardTitle>
-                <p className="text-zinc-500 text-xs mt-1">
-                  Recent SME transactions and bill payment status from alternative data sources
+                <CardTitle className="text-zinc-100">Bill &amp; Payment Records</CardTitle>
+                <p className="text-zinc-400 text-xs mt-1">
+                  Recent bill payments and transactions from utility companies, phone providers, and mobile wallets
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {(['all', 'verified', 'delayed', 'disconnected'] as const).map((status) => (
-                  <button
-                    key={status}
-                    type="button"
-                    onClick={() => setFilter(status)}
-                    className={cn(
-                      'px-2.5 py-1 rounded-md text-xs font-medium border transition-colors capitalize',
-                      filter === status
-                        ? 'bg-emerald-600 text-white border-emerald-500'
-                        : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-emerald-500/40'
-                    )}
-                  >
-                    {status === 'all' ? 'All' : status}
-                  </button>
-                ))}
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                {/* Search input */}
+                <input
+                  type="text"
+                  placeholder="Search provider or business..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1 text-xs text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+
+                {/* Status Filter Buttons */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {(['all', 'verified', 'delayed', 'disconnected'] as const).map((status) => (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => setFilter(status)}
+                      className={cn(
+                        'px-2.5 py-1 rounded-md text-xs font-medium border transition-colors capitalize',
+                        filter === status
+                          ? 'bg-emerald-600 text-white border-emerald-500'
+                          : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-emerald-500/40'
+                      )}
+                    >
+                      {status === 'all' ? 'All' : status}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </CardHeader>
 
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm" aria-label="Telecom and Utility Feed Data Table">
                 <thead className="bg-zinc-900/80 border-b border-zinc-800/80 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
                   <tr>
-                    <th className="px-5 py-3.5">Provider</th>
-                    <th className="px-5 py-3.5">Business</th>
-                    <th className="px-5 py-3.5">Service Type</th>
-                    <th className="px-5 py-3.5">Amount</th>
-                    <th className="px-5 py-3.5">Due Date</th>
-                    <th className="px-5 py-3.5">Status</th>
-                    <th className="px-5 py-3.5">Reliability</th>
-                    <th className="px-5 py-3.5">Data Point</th>
+                    <th scope="col" className="px-5 py-3.5">Provider</th>
+                    <th scope="col" className="px-5 py-3.5">Business</th>
+                    <th scope="col" className="px-5 py-3.5">Service Type</th>
+                    <th scope="col" className="px-5 py-3.5">Amount</th>
+                    <th scope="col" className="px-5 py-3.5">Due Date</th>
+                    <th scope="col" className="px-5 py-3.5">Status</th>
+                    <th scope="col" className="px-5 py-3.5">Reliability</th>
+                    <th scope="col" className="px-5 py-3.5">Data Point</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
                   {filteredFeeds.length === 0 && (
                     <tr>
                       <td colSpan={8} className="px-5 py-10 text-center text-sm text-zinc-400">
-                        No feeds found for this filter.
+                        No feeds found matching your criteria.
                       </td>
                     </tr>
                   )}
@@ -388,6 +410,7 @@ function TelecomFeedContent() {
     </AppLayout>
   );
 }
+
 
 function MetricCard({
   label,

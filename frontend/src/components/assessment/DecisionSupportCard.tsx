@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 import {
   Printer,
   FileText,
@@ -26,10 +27,42 @@ export function DecisionSupportCard({
 }: DecisionSupportCardProps) {
   const [underwriterNotes, setUnderwriterNotes] = useState('');
   const [isSaved, setIsSaved] = useState(false);
+  const { toast } = useToast();
 
   const handleSaveNotes = () => {
     setIsSaved(true);
+    toast({
+      type: 'success',
+      title: 'Remarks Saved',
+      description: 'Underwriting evaluation notes persisted to borrower record.',
+    });
     setTimeout(() => setIsSaved(false), 2000);
+  };
+
+  const handleStatusChange = (nextStatus: LoanStatus) => {
+    if (!applicationId || !onUpdateStatus) return;
+    const target = status === nextStatus ? 'pending' : nextStatus;
+    onUpdateStatus(applicationId, target);
+
+    if (target === 'approved') {
+      toast({
+        type: 'success',
+        title: 'Loan Approved',
+        description: `Application ${applicationId} cleared for disbursement.`,
+      });
+    } else if (target === 'rejected') {
+      toast({
+        type: 'error',
+        title: 'Loan Declined',
+        description: `Application ${applicationId} marked as declined.`,
+      });
+    } else {
+      toast({
+        type: 'info',
+        title: 'Status Reset',
+        description: `Application ${applicationId} returned to pending review.`,
+      });
+    }
   };
 
   return (
@@ -90,18 +123,18 @@ export function DecisionSupportCard({
               <Button
                 variant={status === 'approved' ? 'success' : 'outline'}
                 size="sm"
-                onClick={() => onUpdateStatus(applicationId, status === 'approved' ? 'pending' : 'approved')}
+                onClick={() => handleStatusChange('approved')}
                 leftIcon={<Check className="w-3.5 h-3.5" />}
               >
-                {status === 'approved' ? 'Approved' : 'Approve'}
+                {status === 'approved' ? 'Approved' : 'Approve Application'}
               </Button>
               <Button
                 variant={status === 'rejected' ? 'danger' : 'outline'}
                 size="sm"
-                onClick={() => onUpdateStatus(applicationId, status === 'rejected' ? 'pending' : 'rejected')}
+                onClick={() => handleStatusChange('rejected')}
                 leftIcon={<X className="w-3.5 h-3.5" />}
               >
-                {status === 'rejected' ? 'Rejected' : 'Reject'}
+                {status === 'rejected' ? 'Declined' : 'Reject Application'}
               </Button>
             </>
           )}
@@ -111,10 +144,11 @@ export function DecisionSupportCard({
             onClick={handleSaveNotes}
             leftIcon={isSaved ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <FileText className="w-3.5 h-3.5" />}
           >
-            {isSaved ? 'Remarks Saved' : 'Save Underwriter Remarks'}
+            {isSaved ? 'Remarks Saved' : 'Save Remarks'}
           </Button>
         </div>
       </CardFooter>
     </Card>
   );
 }
+

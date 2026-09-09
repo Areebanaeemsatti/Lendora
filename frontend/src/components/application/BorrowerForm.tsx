@@ -10,11 +10,12 @@ import { RepaymentBehaviorSection } from '@/components/application/RepaymentBeha
 import { SupportingDocumentsSection } from '@/components/application/SupportingDocumentsSection';
 import { OptionalCreditSection } from '@/components/application/OptionalCreditSection';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 import { BorrowerApplication, SupportingDocument } from '@/types';
 import { saveApplicationLocally, submitCreditScoreAssessment } from '@/lib/storage';
 import { useApplications } from '@/components/providers/ApplicationsProvider';
 import { deriveAltCreditScore, deriveRiskLevel } from '@/lib/mockData';
-import { ArrowRight, RotateCcw, Sparkles, AlertCircle } from 'lucide-react';
+import { ArrowRight, RotateCcw, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react';
 import { formatPKR } from '@/lib/utils';
 
 function createBorrowerId() {
@@ -63,6 +64,8 @@ const initialFormData: BorrowerApplication = {
 export function BorrowerForm() {
   const router = useRouter();
   const { addApplication, submitApplication } = useApplications();
+  const { toast } = useToast();
+
   const [formData, setFormData] = useState<BorrowerApplication>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,8 +113,9 @@ export function BorrowerForm() {
   };
 
   const prefillSampleData = () => {
+    const newId = 'app-' + Date.now();
     setFormData({
-      id: 'app-' + Date.now(),
+      id: newId,
       submittedAt: new Date().toISOString(),
       status: 'pending_review',
       borrowerId: 'LEN-PK-2026-8942',
@@ -160,6 +164,11 @@ export function BorrowerForm() {
       traditionalCreditNotes: 'Active JazzCash merchant with consistent seasonal sales.',
     });
     setErrors({});
+    toast({
+      type: 'info',
+      title: 'Sample Applicant Profile Loaded',
+      description: 'Pre-filled fields for Rashid Mahmood Ansari (Lahore small business owner).',
+    });
   };
 
   const validateForm = (): boolean => {
@@ -245,6 +254,11 @@ export function BorrowerForm() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
+      toast({
+        type: 'warning',
+        title: 'Validation Errors Found',
+        description: 'Please review required fields marked in red before submitting.',
+      });
       const firstErrorKey = Object.keys(newErrors)[0];
       const el = document.getElementById(firstErrorKey);
       if (el) {
@@ -310,8 +324,19 @@ export function BorrowerForm() {
           baseScore: 520,
         });
       }
+
+      toast({
+        type: 'success',
+        title: 'Application Submitted Successfully',
+        description: `Assessment generated for ${submissionPayload.fullName}. Redirecting to workdesk...`,
+      });
     } catch (err) {
       console.warn('Form submission handled with safe fallback:', err);
+      toast({
+        type: 'info',
+        title: 'Application Created locally',
+        description: `Added ${submissionPayload.fullName} to underwriter queue.`,
+      });
     } finally {
       setIsSubmitting(false);
       router.push(`/risk-assessments?id=${submissionPayload.id}`);
@@ -320,18 +345,20 @@ export function BorrowerForm() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
-      <div className="border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header Banner */}
+      <div className="border border-zinc-800/80 bg-zinc-900/60 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-zinc-100 tracking-tight">
-              New Borrower Application
+            <ShieldCheck className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-lg font-bold text-zinc-100 tracking-tight">
+              New Loan Application Form
             </h2>
-            <span className="text-xs font-semibold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
-              Alternative Financial Data
+            <span className="text-xs font-semibold bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+              Small Business / Self-Employed
             </span>
           </div>
-          <p className="text-xs text-zinc-500 mt-1">
-            Collect applicant details, cashflow estimates, and high-frequency mobile wallet signals for risk assessment.
+          <p className="text-xs text-zinc-400 mt-1">
+            Fill in the applicant’s details, income, and payment history. Our system will automatically calculate a credit score and loan risk rating.
           </p>
         </div>
 
@@ -343,7 +370,7 @@ export function BorrowerForm() {
             onClick={prefillSampleData}
             leftIcon={<Sparkles className="w-3.5 h-3.5 text-emerald-400" />}
           >
-            Fill Sample Borrower
+            Prefill Sample Borrower
           </Button>
           <Button
             type="button"
@@ -352,37 +379,51 @@ export function BorrowerForm() {
             onClick={() => {
               setFormData(initialFormData);
               setErrors({});
+              toast({
+                type: 'info',
+                title: 'Form Reset',
+                description: 'All input fields cleared.',
+              });
             }}
             leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
           >
-            Reset
+            Reset Form
           </Button>
         </div>
       </div>
 
+      {/* Live Preview Scorecard Banner */}
       {liveScore && (
-        <div className="rounded-lg border border-emerald-500/20 bg-zinc-950 text-zinc-100 px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
           <div>
-            <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-400">
-              Live underwriting preview
-            </p>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <p className="text-[11px] uppercase tracking-wider font-bold text-emerald-400">
+                Live Credit Score Preview
+              </p>
+            </div>
             <p className="text-xs text-zinc-400 mt-1">
-              Alt credit score is estimated from income, requested amount, and repayment signals. No API call is made.
+              This score updates automatically as you fill in the form. It’s based on the income, loan amount, and payment history you’ve entered so far.
             </p>
           </div>
+
           <div className="flex items-center gap-6">
-            <div>
-              <p className="text-[10px] uppercase text-zinc-500 font-semibold">Alt Score</p>
-              <p className="text-2xl font-bold text-emerald-400 font-mono">{liveScore.altCreditScore}</p>
+            <div className="text-right sm:text-left">
+              <p className="text-[10px] uppercase text-zinc-400 font-semibold">Estimated Score</p>
+              <p className="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight">
+                {liveScore.altCreditScore}
+              </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase text-zinc-500 font-semibold">Risk Level</p>
-              <p className="text-sm font-semibold text-white">{liveScore.riskLevel}</p>
+              <p className="text-[10px] uppercase text-zinc-400 font-semibold">Risk Level</p>
+              <span className="inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                {liveScore.riskLevel} Risk
+              </span>
             </div>
             {Number(formData.requestedLoanAmountPKR) > 0 && (
-              <div className="hidden md:block">
-                <p className="text-[10px] uppercase text-zinc-500 font-semibold">Requested</p>
-                <p className="text-sm font-semibold text-white">
+              <div className="hidden md:block border-l border-zinc-800 pl-4">
+                <p className="text-[10px] uppercase text-zinc-400 font-semibold">Requested Amount</p>
+                <p className="text-sm font-bold text-white font-mono mt-0.5">
                   {formatPKR(Number(formData.requestedLoanAmountPKR))}
                 </p>
               </div>
@@ -391,8 +432,10 @@ export function BorrowerForm() {
         </div>
       )}
 
+      {/* Progress Steps Header */}
       <ApplicationProgress currentStep={3} />
 
+      {/* Main Intake Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <BasicInfoSection formData={formData} errors={errors} onChange={handleFieldChange} />
         <FinancialProfileSection formData={formData} errors={errors} onChange={handleFieldChange} />
@@ -406,10 +449,10 @@ export function BorrowerForm() {
         <OptionalCreditSection formData={formData} onChange={handleFieldChange} />
 
         {Object.keys(errors).length > 0 && (
-          <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/25 flex items-start gap-3">
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
             <div className="space-y-1 text-xs text-rose-300">
-              <p className="font-semibold">Please resolve the following required fields before proceeding:</p>
+              <p className="font-semibold">Please complete all required fields before generating assessment:</p>
               <ul className="list-disc list-inside space-y-0.5 text-rose-300">
                 {Object.values(errors).map((err, i) => (
                   <li key={i}>{err}</li>
@@ -419,10 +462,11 @@ export function BorrowerForm() {
           </div>
         )}
 
-        <div className="border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-zinc-500 text-center sm:text-left">
-            <span>By continuing, this application is added to the local underwriter queue for </span>
-            <span className="font-semibold text-zinc-200">Approve / Reject review</span>.
+        <div className="border border-zinc-800/80 bg-zinc-900/60 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-zinc-400 text-center sm:text-left">
+            <span>Submitting this form adds the applicant to the </span>
+            <strong className="text-zinc-200">Lendora review queue</strong>
+            <span> and automatically generates a credit score and risk summary.</span>
           </div>
 
           <Button
@@ -432,10 +476,11 @@ export function BorrowerForm() {
             isLoading={isSubmitting}
             rightIcon={!isSubmitting && <ArrowRight className="w-4 h-4" />}
           >
-            {isSubmitting ? 'Saving to underwriter queue...' : 'Submit to Underwriter Dashboard'}
+            {isSubmitting ? 'Calculating Credit Score...' : 'Submit Application & Get Score'}
           </Button>
         </div>
       </form>
     </div>
   );
 }
+

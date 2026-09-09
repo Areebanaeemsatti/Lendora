@@ -6,29 +6,29 @@ import { cn } from '@/lib/utils';
 
 const SLIDES = [
   {
-    eyebrow: 'Alternative Credit',
-    title: 'Alternative Credit Scoring',
+    eyebrow: 'Credit Scoring',
+    title: 'Credit Scoring Without a Bank History',
     description:
-      'JazzCash / Easypaisa wallet velocity, telco recharge patterns, and utility bill settlement are analyzed to build credit scores for thin-file Pakistani borrowers.',
-    chip: 'JazzCash · Easypaisa · Utility Data',
+      'Lendora checks JazzCash and Easypaisa payment activity, phone recharge patterns, and utility bill payments to give fair credit scores to small business owners who may not have a formal bank account.',
+    chip: 'JazzCash · Easypaisa · Utility Bills',
     icon: BarChart3,
     accent: 'text-emerald-400',
   },
   {
-    eyebrow: 'Explainable AI',
-    title: 'Explainable AI Engine',
+    eyebrow: 'Clear Explanations',
+    title: 'Understand Why Every Score Was Given',
     description:
-      'Every score is backed by a real-time SHAP feature contribution breakdown, so underwriters can see exactly which signals moved the risk rating and why.',
-    chip: 'SHAP TreeExplainer · Feature Attribution',
+      'Every credit score comes with a simple, plain-language explanation showing exactly which factors helped or lowered the score — no technical knowledge needed to understand it.',
+    chip: 'Step-by-step breakdown · Easy to read',
     icon: Sparkles,
     accent: 'text-sky-400',
   },
   {
-    eyebrow: 'Automated Underwriting',
-    title: 'Automated Underwriting Queue',
+    eyebrow: 'Quick Decisions',
+    title: 'Fast Loan Review & Approval',
     description:
-      'Applications are risk-tiered instantly (Low → High) with Approve / Reject decisioning, keeping the underwriting queue moving with zero manual scoring.',
-    chip: 'Risk Tiering · Decisioning',
+      'Applications are automatically sorted by risk level (Low, Medium, or High), making it easy for loan officers to approve or decline quickly without manual calculations.',
+    chip: 'Risk Sorting · One-click Decisions',
     icon: ListChecks,
     accent: 'text-teal-400',
   },

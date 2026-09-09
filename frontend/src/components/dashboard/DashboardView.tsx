@@ -10,17 +10,18 @@ import { ModelHealthWidget } from './ModelHealthWidget';
 export function DashboardView() {
   return (
     <AppLayout>
-      {/* Hero Carousel */}
-      <HeroCarousel />
-
-      {/* Portfolio Overview KPIs */}
+      {/* 1. Executive Portfolio KPIs */}
       <PortfolioStats />
 
-      {/* Recent Underwriting Queue */}
+      {/* 2. Recent Underwriting Queue */}
       <RecentAssessmentsTable />
 
-      {/* Model Health & Architecture Overview */}
+      {/* 3. Model Health & Architecture Telemetry */}
       <ModelHealthWidget />
+
+      {/* 4. Platform Capabilities Overview Banner */}
+      <HeroCarousel />
     </AppLayout>
   );
 }
+

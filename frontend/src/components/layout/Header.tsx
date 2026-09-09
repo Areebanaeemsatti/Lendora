@@ -80,13 +80,13 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
 
           <Link href="/new-application">
             <Button variant="primary" size="sm" leftIcon={<PlusCircle className="h-3.5 w-3.5" />}>
-              New Application
+              New Applicant
             </Button>
           </Link>
 
           <Link href="/risk-assessments" className="hidden md:inline-flex">
             <Button variant="secondary" size="sm" leftIcon={<ShieldCheck className="h-3.5 w-3.5" />}>
-              Risk Assessments
+              Loan Risk Checks
             </Button>
           </Link>
 
@@ -102,13 +102,14 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
 
           <div className="ml-1 flex items-center gap-2 border-l border-zinc-800 pl-3">
             <div className="flex h-7 w-7 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-[10px] font-semibold text-zinc-200">
-              UW
+              LO
             </div>
             <div className="hidden leading-tight xl:block">
-              <p className="text-xs font-medium text-zinc-200">Risk Underwriter</p>
-              <p className="text-[10px] text-zinc-500">Karachi Desk (PK)</p>
+              <p className="text-xs font-medium text-zinc-200">Loan Officer</p>
+              <p className="text-[10px] text-zinc-500">Pakistan Desk</p>
             </div>
           </div>
+
         </div>
       </div>
     </header>

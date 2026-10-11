@@ -19,9 +19,9 @@ export function FinancialProfileSection({ formData, errors, onChange }: Props) {
             <Wallet className="w-4 h-4" />
           </div>
           <div>
-            <CardTitle>Section 2: Income & Financial Profile</CardTitle>
+            <CardTitle>Section 2: Monthly Income &amp; Budget</CardTitle>
             <CardDescription>
-              Cashflow estimates and requested loan financing parameters
+              Your monthly earnings, living expenses, and requested loan terms
             </CardDescription>
           </div>
         </div>
@@ -38,7 +38,7 @@ export function FinancialProfileSection({ formData, errors, onChange }: Props) {
             }
             error={errors.monthlyIncomePKR}
             placeholder="e.g. 75000"
-            helperText="Estimated average monthly income based on available financial activity."
+            helperText="Your estimated average take-home monthly earnings."
           />
 
           <Input
@@ -51,7 +51,7 @@ export function FinancialProfileSection({ formData, errors, onChange }: Props) {
             }
             error={errors.monthlyExpensesPKR}
             placeholder="e.g. 45000"
-            helperText="Estimated food, utility, rent, and recurring family living costs."
+            helperText="Estimated monthly spending on rent, utilities, food, and family expenses."
           />
 
           <Input

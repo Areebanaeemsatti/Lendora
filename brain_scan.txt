@@ -1,0 +1,24 @@
+﻿
+Path                                                                                                                                            LineNumb
+                                                                                                                                                      er
+----                                                                                                                                            --------
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript\00000000.jsonl            65
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript\00000002.jsonl            34
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript\00000003.jsonl             5
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript\00000005.jsonl            44
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript\00000006.jsonl             9
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript\00000007.jsonl            29
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript\00000008.jsonl            26
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript_full\00000001.jsonl        5
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript_full\00000004.jsonl        3
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript_full\00000005.jsonl       42
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript_full\00000007.jsonl       41
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript_full\00000008.jsonl       17
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript_full\00000010.jsonl        7
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\chunks\transcript_full\00000011.jsonl       17
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\transcript.jsonl                            65
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\logs\transcript_full.jsonl                       65
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\steps\511\output.txt                              1
+C:\Users\WK Traders\.gemini\antigravity\brain\29a1ac39-afc2-4eab-a47a-83bea734f6b1\.system_generated\steps\513\output.txt                              1
+
+

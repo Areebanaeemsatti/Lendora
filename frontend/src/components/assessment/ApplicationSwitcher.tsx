@@ -18,10 +18,10 @@ export function ApplicationSwitcher({ applications, selectedId, onSelect }: Prop
   if (applications.length <= 1) return null;
 
   return (
-    <div className="border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="border border-white/80 bg-white/70 rounded-lg p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <Users className="w-4 h-4 text-zinc-500" />
-        <span className="text-xs font-semibold text-zinc-300">
+        <Users className="w-4 h-4 text-[#475569]" />
+        <span className="text-xs font-semibold text-[#1E293B]">
           Underwriting Queue ({applications.length} applications):
         </span>
       </div>
@@ -30,7 +30,7 @@ export function ApplicationSwitcher({ applications, selectedId, onSelect }: Prop
         <select
           value={selectedId}
           onChange={(e) => onSelect(e.target.value)}
-          className="w-full text-xs px-3 py-1.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+          className="w-full text-xs px-3 py-1.5 rounded-md bg-white/70 border border-white/80 text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#0072ff]/20"
         >
           {applications.map((app) => (
             <option key={app.id} value={app.id}>

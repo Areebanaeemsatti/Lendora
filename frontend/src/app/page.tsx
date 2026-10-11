@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { LandingPage } from '@/pages/LandingPage';
+import { LandingPage } from '@/components/landing/LandingPage';
 
 export const metadata: Metadata = {
-  title: 'Lendora — Alternative Credit Platform',
+  title: 'Lendora — Simple credit access for everyday borrowers',
   description:
-    'Lendora turns telecom, utility and wallet data into explainable, decision-ready credit scores for thin-file Pakistani borrowers.',
+    'A transparent digital platform helping borrowers and teams review applications clearly and fairly. Role-Based Protected Access • Digital Lending Standards Compliant.',
 };
 
 /**

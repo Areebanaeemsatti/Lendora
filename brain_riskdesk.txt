@@ -1,0 +1,17 @@
+﻿
+Path                                                                                                                                           
+----                                                                                                                                           
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\transcript.jsonl                     
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\transcript_full.jsonl                
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript\00000001.jsonl     
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript\00000002.jsonl     
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript\00000003.jsonl     
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript\00000004.jsonl     
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript_full\00000000.jsonl
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript_full\00000001.jsonl
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript_full\00000002.jsonl
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript_full\00000004.jsonl
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\logs\chunks\transcript_full\00000006.jsonl
+C:\Users\WK Traders\.gemini\antigravity\brain\6d2d15b5-b4fd-4891-a456-595f85836b79\.system_generated\steps\318\output.txt                      
+
+

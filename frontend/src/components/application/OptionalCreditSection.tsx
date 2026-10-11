@@ -17,15 +17,15 @@ export function OptionalCreditSection({ formData, onChange }: Props) {
   ];
 
   return (
-    <Card id="section-5" className="border-zinc-800/80 bg-zinc-900/60">
+    <Card id="section-5" className="border-white/80 bg-white/70">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 text-[#475569] flex items-center justify-center font-bold">
               <Shield className="w-4 h-4" />
             </div>
             <div>
-              <CardTitle className="text-zinc-100">
+              <CardTitle className="text-[#0F172A]">
                 Section 5: Optional Traditional Credit History
               </CardTitle>
               <CardDescription>
@@ -33,13 +33,13 @@ export function OptionalCreditSection({ formData, onChange }: Props) {
               </CardDescription>
             </div>
           </div>
-          <span className="text-xs font-semibold text-zinc-400 bg-zinc-800 px-2.5 py-0.5 rounded-full">
+          <span className="text-xs font-semibold text-[#475569] bg-slate-100 px-2.5 py-0.5 rounded-full">
             Optional
           </span>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-300 leading-relaxed">
+        <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-700 leading-relaxed">
           <span className="font-semibold">Alternative Credit Philosophy:</span> Traditional credit information is optional. Lendora is designed to supplement limited traditional credit history with alternative financial signals.
         </div>
 

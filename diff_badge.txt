@@ -1,0 +1,59 @@
+﻿diff --git a/frontend/src/components/ui/Badge.tsx b/frontend/src/components/ui/Badge.tsx
+index 28bf8ea..a2887f0 100644
+--- a/frontend/src/components/ui/Badge.tsx
++++ b/frontend/src/components/ui/Badge.tsx
+@@ -23,14 +23,14 @@ export function Badge({
+   ...props
+ }: BadgeProps) {
+   const variants = {
+-    default: 'bg-zinc-800/60 text-zinc-300 border-zinc-700',
+-    secondary: 'bg-zinc-800 text-zinc-200 border-zinc-700',
+-    outline: 'bg-transparent text-zinc-300 border-zinc-700',
+-    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
+-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+-    danger: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
+-    info: 'bg-sky-500/10 text-sky-400 border-sky-500/25',
+-    emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
++    default: 'bg-white/70 text-[#475569] border-white/80',
++    secondary: 'bg-white/85 text-[#1E293B] border-white/90',
++    outline: 'bg-transparent text-[#475569] border-slate-300/70',
++    success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
++    warning: 'bg-amber-50 text-amber-700 border-amber-200',
++    danger: 'bg-rose-50 text-rose-700 border-rose-200',
++    info: 'bg-sky-50 text-[#0072ff] border-sky-200',
++    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+   };
+ 
+   return (
+@@ -54,7 +54,7 @@ export function Badge({
+               ? 'bg-rose-500'
+               : variant === 'info'
+               ? 'bg-sky-500'
+-              : 'bg-zinc-400'
++              : 'bg-slate-400'
+           )}
+         />
+       )}
+@@ -81,17 +81,17 @@ export function StatusBadge({ status }: { status: ApplicationStatus }) {
+ }
+ 
+ export function RiskTierBadge({ tier }: { tier?: RiskTier }) {
+-  if (!tier) return <span className="text-zinc-500 text-xs">Unscored</span>;
++  if (!tier) return <span className="text-[#475569] text-xs">Unscored</span>;
+ 
+   switch (tier) {
+     case 'low':
+-      return <Badge variant="success">Tier A (Low Risk)</Badge>;
++      return <Badge variant="success">Low Priority</Badge>;
+     case 'moderate':
+-      return <Badge variant="info">Tier B (Moderate)</Badge>;
++      return <Badge variant="info">Standard Priority</Badge>;
+     case 'elevated':
+-      return <Badge variant="warning">Tier C (Elevated)</Badge>;
++      return <Badge variant="warning">Elevated Priority</Badge>;
+     case 'high':
+-      return <Badge variant="danger">Tier D (High Risk)</Badge>;
++      return <Badge variant="danger">High Review Priority</Badge>;
+     default:
+       return <Badge variant="default">{tier}</Badge>;
+   }

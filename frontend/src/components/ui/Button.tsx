@@ -25,21 +25,21 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium transition-all duration-150 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
+      'inline-flex items-center justify-center font-medium transition-all duration-150 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#F4F8FB] disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
 
     const variants = {
       primary:
-        'bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500/40 border border-emerald-500/30',
+        'text-white border border-white/30 shadow-[0_8px_24px_rgba(0,114,255,0.28)] focus:ring-[#0072ff]/40 [background-image:linear-gradient(135deg,#00c6ff_0%,#0072ff_100%)] hover:[filter:brightness(1.05)]',
       secondary:
-        'bg-zinc-900 text-zinc-300 hover:bg-zinc-800 focus:ring-zinc-600 border border-zinc-700',
+        'bg-white/70 text-[#1E293B] border border-white/80 hover:bg-white/95 focus:ring-[#0072ff]/30',
       outline:
-        'bg-transparent text-zinc-300 hover:bg-zinc-800/60 hover:text-zinc-100 focus:ring-zinc-600 border border-zinc-700',
+        'bg-white/60 text-[#1E293B] border border-slate-300/70 hover:bg-white/95 hover:border-[#0072ff]/50 hover:text-[#0072ff] focus:ring-[#0072ff]/30',
       ghost:
-        'bg-transparent text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-100 focus:ring-zinc-600',
+        'bg-transparent text-[#475569] hover:bg-white/70 hover:text-[#0072ff] focus:ring-[#0072ff]/30',
       danger:
         'bg-rose-600 text-white hover:bg-rose-500 focus:ring-rose-500/40 border border-rose-500/30',
       success:
-        'bg-teal-600 text-white hover:bg-teal-500 focus:ring-teal-500/40 border border-teal-500/30',
+        'bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500/40 border border-emerald-500/30',
     };
 
     const sizes = {

@@ -39,9 +39,9 @@ export function BasicInfoSection({ formData, errors, onChange }: Props) {
             <User className="w-4 h-4" />
           </div>
           <div>
-            <CardTitle>Section 1: Basic Borrower Information</CardTitle>
+            <CardTitle>Section 1: Basic Information</CardTitle>
             <CardDescription>
-              Primary applicant identification and employment category
+              Your personal and employment details
             </CardDescription>
           </div>
         </div>
@@ -49,12 +49,12 @@ export function BasicInfoSection({ formData, errors, onChange }: Props) {
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Input
-            label="Borrower / Application ID"
+            label="Application ID"
             value={formData.borrowerId}
             onChange={(e) => onChange('borrowerId', e.target.value)}
             error={errors.borrowerId}
             placeholder="e.g. LEN-PK-2026-01"
-            helperText="System reference identifier for this applicant"
+            helperText="Unique reference code for your application"
           />
 
           <Input

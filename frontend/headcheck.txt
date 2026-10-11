@@ -1,0 +1,6 @@
+﻿head_underwriter lines: 260
+RISK DESK in head_underwriter: False
+TELECOM in head_underwriter: False
+Tier A in head_badge: True
+Calibrated in head_summary: True
+risk page lines: 189

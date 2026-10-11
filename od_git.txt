@@ -1,0 +1,64 @@
+﻿=== OneDrive branch ===
+=== OneDrive log ===
+accf41e chore: trigger fresh vercel deployment
+9c08a57 refactor: improve UI usability and humanize SHAP breakdown
+8e0cef4 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+6652132 Update README.md
+f19317d Create README.md
+30c07a0 Merge pull request #5 from Areebanaeemsatti/feature/nextjs-portal
+be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+45b2c12 feat(frontend): complete Step 03 - FastAPI ML backend endpoint integration & live SHAP rendering
+=== OneDrive status ===
+M  .gitignore
+M  README.md
+ D data/lendora_demo_borrowers_50.csv
+A  index.html
+A  package-lock.json
+A  package.json
+A  postcss.config.js
+A  src/App.tsx
+A  src/components/auth/BorrowerLoginForm.tsx
+A  src/components/auth/RoleSwitcher.tsx
+A  src/components/auth/UnderwriterLoginForm.tsx
+A  src/components/borrower/ApplyLoanModal.tsx
+A  src/components/borrower/AvailableLimitCard.tsx
+A  src/components/borrower/BorrowerProfile.tsx
+A  src/components/borrower/BorrowerSettings.tsx
+A  src/components/borrower/DueDateTracker.tsx
+A  src/components/borrower/HeroCarousel.tsx
+A  src/components/borrower/RepayLoanModal.tsx
+A  src/components/borrower/TransactionHistory.tsx
+A  src/components/common/Footer.tsx
+A  src/components/common/GlassCard.tsx
+A  src/components/common/Header.tsx
+A  src/components/common/Modal.tsx
+A  src/components/guards/AdminGuard.tsx
+A  src/components/guards/BorrowerGuard.tsx
+A  src/components/underwriter/ApplicantInspector.tsx
+A  src/components/underwriter/ApplicationQueue.tsx
+A  src/components/underwriter/RiskTierBadge.tsx
+A  src/components/underwriter/ShapWaterfallChart.tsx
+A  src/components/underwriter/UnderwritingControls.tsx
+A  src/context/authContext.tsx
+A  src/context/borrowerContext.tsx
+A  src/context/underwriterContext.tsx
+A  src/index.css
+A  src/main.tsx
+A  src/pages/AuthPage.tsx
+A  src/pages/BorrowerDashboard.tsx
+A  src/pages/LandingPage.tsx
+A  src/pages/NotFoundPage.tsx
+A  src/pages/UnderwriterDashboard.tsx
+A  src/types/auth.ts
+A  src/types/borrower.ts
+A  src/types/underwriter.ts
+A  src/utils/formatters.ts
+A  src/utils/storage.ts
+A  src/utils/validators.ts
+A  tailwind.config.js
+A  tsconfig.json
+A  tsconfig.node.json
+A  vite.config.ts
+=== OneDrive remotes ===
+origin	https://github.com/Areebanaeemsatti/Lendora.git (fetch)
+origin	https://github.com/Areebanaeemsatti/Lendora.git (push)

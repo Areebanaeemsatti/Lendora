@@ -1,0 +1,4 @@
+﻿=== .next cache search ===
+NOT in .next
+=== UTF-16 source files ===
+none

@@ -1,0 +1,3 @@
+﻿e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+45b2c12 feat(frontend): complete Step 03 - FastAPI ML backend endpoint integration & live SHAP rendering

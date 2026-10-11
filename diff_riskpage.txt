@@ -1,0 +1,94 @@
+﻿diff --git a/frontend/src/app/risk-assessments/page.tsx b/frontend/src/app/risk-assessments/page.tsx
+index b3145aa..51b52d1 100644
+--- a/frontend/src/app/risk-assessments/page.tsx
++++ b/frontend/src/app/risk-assessments/page.tsx
+@@ -27,7 +27,7 @@ import { PlusCircle, FileCheck } from 'lucide-react';
+ function RiskAssessmentsContent() {
+   const router = useRouter();
+   const searchParams = useSearchParams();
+-  const requestedId = searchParams.get('id');
++  const requestedId = searchParams?.get('id') ?? null;
+   const { applications, updateStatus } = useApplications();
+ 
+   const [currentApp, setCurrentApp] = useState<BorrowerApplication | null>(null);
+@@ -61,18 +61,18 @@ function RiskAssessmentsContent() {
+   return (
+     <AppLayout>
+       <div className="space-y-6 max-w-7xl mx-auto pb-16">
+-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-4">
++        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/80 bg-white/70 rounded-lg p-4">
+           <div>
+             <div className="flex items-center gap-2">
+-              <h2 className="text-lg font-semibold text-zinc-100 tracking-tight">
+-                Underwriter Dashboard
++              <h2 className="text-lg font-semibold text-[#0F172A] tracking-tight">
++                Applications &amp; Credit Review
+               </h2>
+               <Badge variant="emerald" dot>
+-                Queue active
++                Active
+               </Badge>
+             </div>
+-            <p className="text-xs text-zinc-500 mt-1">
+-              Review local loan applications, toggle Approve / Reject, and inspect alternative-signal scorecards.
++            <p className="text-xs text-[#475569] mt-1">
++              Review submitted loan applications, manage approval statuses, and inspect clear score breakdowns.
+             </p>
+           </div>
+ 
+@@ -127,26 +127,26 @@ function RiskAssessmentsContent() {
+               onOpenShapModal={() => setShapModalOpen(true)}
+             />
+             <Card className="p-4 border-emerald-500/20 bg-emerald-500/5">
+-              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Selected queue record</p>
+-              <h3 className="text-lg font-bold text-zinc-100 mt-1">{selectedQueueItem.applicantName}</h3>
+-              <p className="text-sm text-zinc-400 mt-2">
++              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Selected Application Details</p>
++              <h3 className="text-lg font-bold text-[#0F172A] mt-1">{selectedQueueItem.applicantName}</h3>
++              <p className="text-sm text-[#475569] mt-2">
+                 Monthly income {formatPKR(selectedQueueItem.income)} ┬╖ requested {formatPKR(selectedQueueItem.requestedAmount)} ┬╖
+-                alt score {selectedQueueItem.altCreditScore} ({selectedQueueItem.riskLevel} risk)
++                credit score {selectedQueueItem.altCreditScore} ({selectedQueueItem.riskLevel} tier)
+               </p>
+-              <p className="text-xs text-zinc-500 mt-3">
+-                Full scorecards appear for applications submitted through the borrower form. This seed record lives in the local queue only.
++              <p className="text-xs text-[#475569] mt-3">
++                Full scorecards appear for applications submitted through the application form.
+               </p>
+             </Card>
+           </div>
+         ) : (
+           <Card className="p-12 text-center">
+             <div className="max-w-md mx-auto space-y-4">
+-              <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 mx-auto">
+-                <FileCheck className="w-6 h-6 text-zinc-500" />
++              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-[#475569] mx-auto">
++                <FileCheck className="w-6 h-6 text-[#475569]" />
+               </div>
+-              <h3 className="text-base font-bold text-zinc-100">No Borrower Application Selected</h3>
+-              <p className="text-xs text-zinc-500 leading-relaxed">
+-                Submit a new borrower application or select an existing record to review alternative financial signals and risk assessment scorecards.
++              <h3 className="text-base font-bold text-[#0F172A]">No Application Selected</h3>
++              <p className="text-xs text-[#475569] leading-relaxed">
++                Submit a new application or select an existing record to review financial activity and score breakdown.
+               </p>
+               <Link href="/new-application">
+                 <Button variant="primary" size="md" leftIcon={<PlusCircle className="w-4 h-4" />}>
+@@ -157,7 +157,7 @@ function RiskAssessmentsContent() {
+           </Card>
+         )}
+ 
+-        {/* Live SHAP Explainability Decomposition Modal */}
++        {/* Score breakdown modal */}
+         <ShapModal
+           isOpen={shapModalOpen}
+           onClose={() => setShapModalOpen(false)}
+@@ -181,7 +181,7 @@ function RiskAssessmentsContent() {
+ export default function RiskAssessmentsPage() {
+   return (
+     <ProtectedRoute>
+-      <Suspense fallback={<div className="p-8 text-center text-xs text-zinc-500">Loading underwriter dashboard...</div>}>
++      <Suspense fallback={<div className="p-8 text-center text-xs text-[#475569]">Loading application review...</div>}>
+         <RiskAssessmentsContent />
+       </Suspense>
+     </ProtectedRoute>

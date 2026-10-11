@@ -1,0 +1,6 @@
+﻿/ -> 200
+/underwriter -> 200
+/dashboard -> 200
+/auth -> 200
+/risk-assessments -> 200
+/telecom-feed -> 200

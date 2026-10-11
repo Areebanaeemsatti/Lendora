@@ -2,14 +2,19 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  initialMockApplications,
-  MOCK_QUEUE_STORAGE_KEY,
   deriveRiskLevel,
   type LoanApplication,
   type LoanStatus,
 } from '@/lib/mockData';
-import { updateStoredApplicationStatus, saveApplicationLocally } from '@/lib/storage';
+import {
+  addSampleApplication,
+  readSharedQueue,
+  subscribeSharedQueue,
+  updateSharedApplicationStatus,
+  upsertSharedApplication,
+} from '@/lib/sharedQueue';
 import { submitCreditScoreAssessment } from '@/lib/api';
+import { useSession } from '@/components/providers/SessionProvider';
 import type { BorrowerApplication, RiskAssessmentResponse } from '@/types';
 
 interface ApplicationsContextValue {
@@ -17,56 +22,52 @@ interface ApplicationsContextValue {
   addApplication: (application: LoanApplication) => void;
   updateStatus: (id: string, status: LoanStatus) => void;
   submitApplication: (application: BorrowerApplication) => Promise<RiskAssessmentResponse>;
+  /** Inject a ready-made sample applicant into the shared queue (officer tool). */
+  addSample: () => void;
 }
 
 const ApplicationsContext = createContext<ApplicationsContextValue | null>(null);
 
+/**
+ * Holds the SHARED loan queue used by both the borrower and underwriter sides.
+ *
+ * The queue lives in one global store (see lib/sharedQueue) rather than being
+ * namespaced per CNIC — that is what makes a borrower's submission appear on
+ * the underwriter's screen instantly, and the officer's decision flow back to
+ * the borrower. All writes go through the shared module, which notifies every
+ * subscriber (in-page and cross-tab) so the UI stays live without polling.
+ */
 export function ApplicationsProvider({ children }: { children: React.ReactNode }) {
-  const [applications, setApplications] = useState<LoanApplication[]>(initialMockApplications);
-  const [hydrated, setHydrated] = useState(false);
+  const { session } = useSession();
 
+  const [applications, setApplications] = useState<LoanApplication[]>([]);
+
+  // Initial read + live subscription to the shared queue.
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(MOCK_QUEUE_STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as LoanApplication[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setApplications(parsed);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to hydrate loan queue', error);
-    } finally {
-      setHydrated(true);
-    }
+    setApplications(readSharedQueue());
+    const unsubscribe = subscribeSharedQueue(() => {
+      setApplications(readSharedQueue());
+    });
+    return unsubscribe;
   }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(MOCK_QUEUE_STORAGE_KEY, JSON.stringify(applications));
-    } catch (error) {
-      console.error('Failed to persist loan queue', error);
-    }
-  }, [applications, hydrated]);
 
   const addApplication = useCallback((application: LoanApplication) => {
-    setApplications((prev) => {
-      const index = prev.findIndex((item) => item.id === application.id);
-      if (index >= 0) {
-        const next = [...prev];
-        next[index] = application;
-        return next;
-      }
-      return [application, ...prev];
-    });
-  }, []);
+    // Stamp the submitting borrower's CNIC so their own dashboard can find it.
+    const withOwner: LoanApplication = session?.cnic
+      ? { ...application, borrowerCnic: session.cnic }
+      : application;
+    upsertSharedApplication(withOwner);
+    setApplications(readSharedQueue());
+  }, [session?.cnic]);
 
   const updateStatus = useCallback((id: string, status: LoanStatus) => {
-    setApplications((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status } : item))
-    );
-    updateStoredApplicationStatus(id, status);
+    updateSharedApplicationStatus(id, status);
+    setApplications(readSharedQueue());
+  }, []);
+
+  const addSample = useCallback(() => {
+    addSampleApplication();
+    setApplications(readSharedQueue());
   }, []);
 
   const submitApplication = useCallback(
@@ -79,14 +80,6 @@ export function ApplicationsProvider({ children }: { children: React.ReactNode }
       const riskLevel = deriveRiskLevel(altScore);
       const shapItems = assessment.shap_values || assessment.shap_explanations || [];
 
-      // Update and save local storage application with live assessment and SHAP items
-      const updatedApp: BorrowerApplication = {
-        ...borrowerApp,
-        assessment,
-        shap_values: shapItems,
-      };
-      saveApplicationLocally(updatedApp);
-
       const loanApp: LoanApplication = {
         id: borrowerApp.id,
         applicantName: borrowerApp.fullName,
@@ -97,26 +90,28 @@ export function ApplicationsProvider({ children }: { children: React.ReactNode }
         status: 'pending',
         shap_values: shapItems,
         shapFeatures: shapItems.map((v) => ({
-          featureName: v.featureName || v.feature_name || 'Feature',
+          featureName: v.featureName || v.feature_name || 'Signal',
           impact: v.impact,
-          category: v.category || (v.impact >= 0 ? 'Score Driver' : 'Risk Flag'),
+          category: v.category || (v.impact >= 0 ? 'Helps your score' : 'Needs attention'),
         })),
         assessment,
         recommendation: assessment.recommendation,
         confidenceScore: assessment.confidence_score,
         defaultProbability: assessment.default_probability,
         baseScore: 520,
+        borrowerCnic: session?.cnic,
       };
 
-      addApplication(loanApp);
+      upsertSharedApplication(loanApp);
+      setApplications(readSharedQueue());
       return assessment;
     },
-    [addApplication]
+    [session?.cnic]
   );
 
   const value = useMemo(
-    () => ({ applications, addApplication, updateStatus, submitApplication }),
-    [applications, addApplication, updateStatus, submitApplication]
+    () => ({ applications, addApplication, updateStatus, submitApplication, addSample }),
+    [applications, addApplication, updateStatus, submitApplication, addSample]
   );
 
   return (

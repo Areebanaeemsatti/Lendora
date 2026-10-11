@@ -1,0 +1,5 @@
+﻿transcript_full size MB: 0.6
+transcript size MB: 0.4
+MATCH line 318 len 10626
+MATCH line 345 len 3500
+MATCH line 354 len 25872

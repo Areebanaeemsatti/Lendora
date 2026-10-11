@@ -314,24 +314,26 @@ export function BorrowerForm() {
       console.warn('Form submission handled with safe fallback:', err);
     } finally {
       setIsSubmitting(false);
-      router.push(`/risk-assessments?id=${submissionPayload.id}`);
+      // Return the borrower to their own dashboard, where a live status
+      // banner reflects the application as the underwriter reviews it.
+      router.push('/dashboard');
     }
   };
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
-      <div className="border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="border border-white/80 bg-white/70 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-zinc-100 tracking-tight">
-              New Borrower Application
+            <h2 className="text-lg font-semibold text-[#0F172A] tracking-tight">
+              New Application
             </h2>
-            <span className="text-xs font-semibold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
-              Alternative Financial Data
+            <span className="text-xs font-semibold bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded border border-emerald-500/20">
+              Simplified Credit Assessment
             </span>
           </div>
-          <p className="text-xs text-zinc-500 mt-1">
-            Collect applicant details, cashflow estimates, and high-frequency mobile wallet signals for risk assessment.
+          <p className="text-xs text-[#475569] mt-1">
+            Provide basic details, monthly budget, and mobile wallet activity for an instant credit review.
           </p>
         </div>
 
@@ -341,9 +343,9 @@ export function BorrowerForm() {
             variant="outline"
             size="sm"
             onClick={prefillSampleData}
-            leftIcon={<Sparkles className="w-3.5 h-3.5 text-emerald-400" />}
+            leftIcon={<Sparkles className="w-3.5 h-3.5 text-emerald-600" />}
           >
-            Fill Sample Borrower
+            Fill Sample Application
           </Button>
           <Button
             type="button"
@@ -361,28 +363,28 @@ export function BorrowerForm() {
       </div>
 
       {liveScore && (
-        <div className="rounded-lg border border-emerald-500/20 bg-zinc-950 text-zinc-100 px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="rounded-lg border border-emerald-500/20 bg-white text-[#0F172A] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-400">
-              Live underwriting preview
+            <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-600">
+              Instant Credit Estimate
             </p>
-            <p className="text-xs text-zinc-400 mt-1">
-              Alt credit score is estimated from income, requested amount, and repayment signals. No API call is made.
+            <p className="text-xs text-[#475569] mt-1">
+              Estimated score based on your stated monthly income, loan amount, and payment habits.
             </p>
           </div>
           <div className="flex items-center gap-6">
             <div>
-              <p className="text-[10px] uppercase text-zinc-500 font-semibold">Alt Score</p>
-              <p className="text-2xl font-bold text-emerald-400 font-mono">{liveScore.altCreditScore}</p>
+              <p className="text-[10px] uppercase text-[#475569] font-semibold">Estimated Score</p>
+              <p className="text-2xl font-bold text-emerald-600 font-mono">{liveScore.altCreditScore}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase text-zinc-500 font-semibold">Risk Level</p>
-              <p className="text-sm font-semibold text-white">{liveScore.riskLevel}</p>
+              <p className="text-[10px] uppercase text-[#475569] font-semibold">Credit Rating</p>
+              <p className="text-sm font-semibold text-[#0F172A]">{liveScore.riskLevel}</p>
             </div>
             {Number(formData.requestedLoanAmountPKR) > 0 && (
               <div className="hidden md:block">
-                <p className="text-[10px] uppercase text-zinc-500 font-semibold">Requested</p>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-[10px] uppercase text-[#475569] font-semibold">Requested</p>
+                <p className="text-sm font-semibold text-[#0F172A]">
                   {formatPKR(Number(formData.requestedLoanAmountPKR))}
                 </p>
               </div>
@@ -407,10 +409,10 @@ export function BorrowerForm() {
 
         {Object.keys(errors).length > 0 && (
           <div className="p-4 rounded-lg bg-rose-500/10 border border-rose-500/25 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-            <div className="space-y-1 text-xs text-rose-300">
+            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <div className="space-y-1 text-xs text-rose-700">
               <p className="font-semibold">Please resolve the following required fields before proceeding:</p>
-              <ul className="list-disc list-inside space-y-0.5 text-rose-300">
+              <ul className="list-disc list-inside space-y-0.5 text-rose-700">
                 {Object.values(errors).map((err, i) => (
                   <li key={i}>{err}</li>
                 ))}
@@ -419,10 +421,10 @@ export function BorrowerForm() {
           </div>
         )}
 
-        <div className="border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-zinc-500 text-center sm:text-left">
-            <span>By continuing, this application is added to the local underwriter queue for </span>
-            <span className="font-semibold text-zinc-200">Approve / Reject review</span>.
+        <div className="border border-white/80 bg-white/70 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-[#475569] text-center sm:text-left">
+            <span>By submitting, your application will be instantly evaluated for </span>
+            <span className="font-semibold text-[#0F172A]">fast approval</span>.
           </div>
 
           <Button
@@ -432,7 +434,7 @@ export function BorrowerForm() {
             isLoading={isSubmitting}
             rightIcon={!isSubmitting && <ArrowRight className="w-4 h-4" />}
           >
-            {isSubmitting ? 'Saving to underwriter queue...' : 'Submit to Underwriter Dashboard'}
+            {isSubmitting ? 'Processing application...' : 'Submit Application'}
           </Button>
         </div>
       </form>

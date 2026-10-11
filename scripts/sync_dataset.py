@@ -19,6 +19,17 @@ for i, row in sample.iterrows():
     provider = str(row["provider"])
     occ = str(row["occupation"])
     occ_title = occ.replace("_", " ").title()
+    # Map raw occupation slug to a canonical EmploymentType from the frontend
+    # union in src/types/index.ts (occ_title is still used for display names).
+    OCC_TO_EMPLOYMENT_TYPE = {
+        "small_shopkeeper": "Small business owner",
+        "street_vendor": "Self-employed",
+        "delivery_rider": "Self-employed",
+        "rickshaw_driver": "Self-employed",
+        "daily_wage_laborer": "Daily wage worker",
+        "domestic_worker": "Informal worker",
+    }
+    employment_type = OCC_TO_EMPLOYMENT_TYPE.get(occ, "Self-employed")
     is_default = int(row["default_label"])
 
     income = 95000 if occ == "small_shopkeeper" else (78000 if occ == "street_vendor" else (68000 if occ in ["delivery_rider", "rickshaw_driver"] else 52000))
@@ -138,7 +149,7 @@ for i, row in sample.iterrows():
         "city": city,
         "province": province,
         "occupation": occ,
-        "employmentType": occ_title,
+        "employmentType": employment_type,
         "monthlyIncomePKR": income,
         "monthlyExpensesPKR": expenses,
         "existingDebtPKR": 5000 if is_default == 0 else 25000,
@@ -184,7 +195,7 @@ for i, row in sample.iterrows():
     }
     borrower_apps.append(borrower_app)
 
-out_path = Path("frontend/lib/dataset.ts")
+out_path = Path("frontend/src/lib/dataset.ts")
 content = f"""import type {{ LoanApplication }} from '@/lib/mockData';
 import type {{ BorrowerApplication }} from '@/types';
 

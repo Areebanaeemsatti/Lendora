@@ -1,0 +1,3 @@
+﻿TOP KEYS:
+step_index, source, type, status, created_at, content
+type: CHECKPOINT

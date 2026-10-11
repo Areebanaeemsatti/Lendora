@@ -24,23 +24,23 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'border border-zinc-800 bg-zinc-900/60 rounded-lg p-4 transition-colors duration-200 hover:border-zinc-700',
+        'border border-white/80 bg-white/70 rounded-lg p-4 transition-colors duration-200 hover:border-slate-200',
         className
       )}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#475569]">
           {title}
         </span>
         {icon && (
-          <div className="w-8 h-8 rounded-md bg-zinc-800/60 flex items-center justify-center text-zinc-300">
+          <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center text-[#1E293B]">
             {icon}
           </div>
         )}
       </div>
 
       <div className="mt-3 flex items-baseline gap-2">
-        <div className="text-2xl font-semibold tracking-tight text-zinc-100 font-mono">
+        <div className="text-2xl font-semibold tracking-tight text-[#0F172A] font-mono">
           {value}
         </div>
       </div>
@@ -52,10 +52,10 @@ export function StatCard({
               className={cn(
                 'inline-flex items-center gap-0.5 font-medium px-1.5 py-0.5 rounded',
                 trend === 'up'
-                  ? 'bg-emerald-500/10 text-emerald-400'
+                  ? 'bg-emerald-500/10 text-emerald-600'
                   : trend === 'down'
-                  ? 'bg-rose-500/10 text-rose-400'
-                  : 'bg-zinc-800 text-zinc-400'
+                  ? 'bg-rose-500/10 text-rose-600'
+                  : 'bg-slate-100 text-[#475569]'
               )}
             >
               {trend === 'up' && <TrendingUp className="w-3 h-3" />}
@@ -64,7 +64,7 @@ export function StatCard({
               {trendValue}
             </span>
           )}
-          {subtext && <span className="text-xs text-zinc-500 truncate">{subtext}</span>}
+          {subtext && <span className="text-xs text-[#475569] truncate">{subtext}</span>}
         </div>
       )}
     </div>

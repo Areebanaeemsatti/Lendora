@@ -152,11 +152,11 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
   };
 
   return (
-    <Card id="section-documents" className="border-zinc-800/80">
+    <Card id="section-documents" className="border-white/80">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
               <ImageIcon className="w-4 h-4" />
             </div>
             <div>
@@ -171,8 +171,8 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
 
       <CardContent className="space-y-5">
         {/* Helper text banner */}
-        <div className="p-3.5 rounded-lg bg-zinc-900/60 border border-zinc-800 text-xs text-zinc-400 leading-relaxed">
-          <span className="font-semibold text-zinc-300">Reviewer Reference:</span> Images are collected as supporting evidence only. They are not automatically used to make a credit decision in this frontend prototype.
+        <div className="p-3.5 rounded-lg bg-white/70 border border-white/80 text-xs text-[#475569] leading-relaxed">
+          <span className="font-semibold text-[#1E293B]">Reviewer Reference:</span> Images are collected as supporting evidence only. They are not automatically used to make a credit decision in this frontend prototype.
         </div>
 
         {/* Drag and Drop Zone */}
@@ -187,7 +187,7 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
               ? 'border-emerald-500 bg-emerald-500/10 ring-4 ring-emerald-500/10'
               : error
               ? 'border-rose-500/60 bg-rose-500/5 hover:border-rose-400'
-              : 'border-zinc-700 hover:border-emerald-500 hover:bg-zinc-900/60 bg-zinc-900/60'
+              : 'border-slate-200 hover:border-emerald-500 hover:bg-white/70 bg-white/70'
           )}
           role="button"
           tabIndex={0}
@@ -208,28 +208,28 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
             onChange={handleFileInputChange}
           />
 
-          <div className="w-12 h-12 rounded-lg bg-zinc-800 group-hover:bg-emerald-500/10 text-zinc-400 group-hover:text-emerald-400 flex items-center justify-center transition-colors">
+          <div className="w-12 h-12 rounded-lg bg-slate-100 group-hover:bg-emerald-500/10 text-[#475569] group-hover:text-emerald-600 flex items-center justify-center transition-colors">
             <UploadCloud className="w-6 h-6" />
           </div>
 
           <div className="space-y-1">
-            <p className="text-sm font-semibold text-zinc-100 group-hover:text-emerald-300">
+            <p className="text-sm font-semibold text-[#0F172A] group-hover:text-emerald-700">
               Upload image proof
             </p>
-            <p className="text-xs text-zinc-500">
-              Drag &amp; drop images here or <span className="text-emerald-400 font-semibold underline underline-offset-2">browse</span>
+            <p className="text-xs text-[#475569]">
+              Drag &amp; drop images here or <span className="text-emerald-600 font-semibold underline underline-offset-2">browse</span>
             </p>
           </div>
 
-          <p className="text-[11px] text-zinc-500">
+          <p className="text-[11px] text-[#475569]">
             PNG, JPG or JPEG • Maximum 5 MB per image
           </p>
         </div>
 
         {/* Validation Error Message */}
         {(errorMessage || error) && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/25 text-xs text-rose-700 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
             <span>{errorMessage || error}</span>
           </div>
         )}
@@ -237,15 +237,15 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
         {/* Uploaded Documents List */}
         {documents.length > 0 && (
           <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between text-xs text-zinc-400 font-semibold">
+            <div className="flex items-center justify-between text-xs text-[#475569] font-semibold">
               <span className="flex items-center gap-1.5">
-                <FileCheck className="w-4 h-4 text-emerald-400" />
+                <FileCheck className="w-4 h-4 text-emerald-600" />
                 Uploaded Proof ({documents.length})
               </span>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1"
+                className="text-emerald-600 hover:text-emerald-700 text-xs font-semibold flex items-center gap-1"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add More
@@ -256,10 +256,10 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="p-4 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition-all flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                  className="p-4 rounded-lg border border-white/80 bg-white/70 hover:border-slate-200 transition-all flex flex-col sm:flex-row items-start sm:items-center gap-4"
                 >
                   {/* Image Thumbnail */}
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-zinc-800 border border-zinc-700 overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                     {doc.previewUrl ? (
                       <img
                         src={doc.previewUrl}
@@ -267,7 +267,7 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <ImageIcon className="w-8 h-8 text-zinc-500" />
+                      <ImageIcon className="w-8 h-8 text-[#475569]" />
                     )}
                   </div>
 
@@ -275,10 +275,10 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
                   <div className="flex-1 w-full space-y-3 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate" title={doc.fileName}>
+                        <p className="text-xs sm:text-sm font-semibold text-[#0F172A] truncate" title={doc.fileName}>
                           {doc.fileName}
                         </p>
-                        <p className="text-[11px] text-zinc-500 font-mono mt-0.5">
+                        <p className="text-[11px] text-[#475569] font-mono mt-0.5">
                           {doc.fileSize}
                         </p>
                       </div>
@@ -288,7 +288,7 @@ export function SupportingDocumentsSection({ documents, error, onChange }: Props
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemove(doc.id)}
-                        className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 self-end sm:self-center h-8 px-2.5 text-xs"
+                        className="text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 self-end sm:self-center h-8 px-2.5 text-xs"
                         leftIcon={<Trash2 className="w-3.5 h-3.5" />}
                       >
                         Remove

@@ -33,20 +33,20 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <div className="flex items-center justify-between">
             <label
               htmlFor={inputId}
-              className="text-xs font-semibold text-zinc-300 tracking-tight"
+              className="text-xs font-semibold text-slate-600 tracking-tight"
             >
               {label}
               {!optional && <span className="text-rose-500 ml-0.5">*</span>}
             </label>
             {optional && (
-              <span className="text-[11px] font-medium text-zinc-500">Optional</span>
+              <span className="text-[11px] font-medium text-slate-400">Optional</span>
             )}
           </div>
         )}
 
-        <div className="relative flex items-center rounded-lg">
+        <div className="relative flex items-center rounded-xl">
           {prefixText && (
-            <div className="absolute left-3 pointer-events-none flex items-center text-xs font-semibold text-zinc-500">
+            <div className="absolute left-3 pointer-events-none flex items-center text-xs font-semibold text-slate-400">
               {prefixText}
             </div>
           )}
@@ -55,31 +55,31 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={cn(
-              'w-full text-xs sm:text-sm px-3.5 py-2.2 rounded-lg bg-zinc-900 border transition-all duration-150 text-zinc-100 placeholder-zinc-500',
-              'focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600',
+              'w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl bg-white/90 border transition-all duration-150 text-[#0F172A] placeholder-slate-400',
+              'focus:outline-none focus:ring-2 focus:ring-[#0072ff]/20 focus:border-[#0072ff]/50',
               prefixText ? 'pl-9' : '',
               suffixText ? 'pr-9' : '',
               error
-                ? 'border-rose-500/60 bg-rose-500/5 focus:border-rose-500 focus:ring-rose-500/20'
-                : 'border-zinc-800 hover:border-zinc-700',
+                ? 'border-rose-400 bg-rose-500/5 focus:border-rose-500 focus:ring-rose-500/20'
+                : 'border-white/80 hover:border-slate-300/70',
               className
             )}
             {...props}
           />
 
           {suffixText && (
-            <div className="absolute right-3 pointer-events-none flex items-center text-xs font-medium text-zinc-500">
+            <div className="absolute right-3 pointer-events-none flex items-center text-xs font-medium text-slate-400">
               {suffixText}
             </div>
           )}
         </div>
 
         {error ? (
-          <p className="text-[11px] font-medium text-rose-400 flex items-center gap-1 mt-1">
+          <p className="text-[11px] font-medium text-rose-600 flex items-center gap-1 mt-1">
             {error}
           </p>
         ) : helperText ? (
-          <p className="text-[11px] text-zinc-500 leading-normal mt-1">{helperText}</p>
+          <p className="text-[11px] text-[#475569] leading-normal mt-1">{helperText}</p>
         ) : null}
       </div>
     );

@@ -1,0 +1,7 @@
+﻿30a9b7b | UD:  | Badge:       return <Badge variant="success">Tier A (Low Risk)</Badge>;
+b1f09ca | UD:  | Badge:       return <Badge variant="success">Tier A (Low Risk)</Badge>;
+32323a2 | UD:  | Badge:       return <Badge variant="success">Tier A (Low Risk)</Badge>;
+cdbc82e | UD:               <h1 className="text-lg font-bold tracking-tight text-[#0F172A]">Loan Review Desk</h1> | Badge:       return <Badge variant="success">Low Priority</Badge>;
+b18cd35 | UD:               <h1 className="text-lg font-bold tracking-tight text-[#0F172A]">Loan Review Desk</h1> | Badge:       return <Badge variant="success">Low Priority</Badge>;
+a5311d5 | UD:               <h1 className="text-lg font-bold tracking-tight text-[#0F172A]">Loan Review Desk</h1> | Badge:       return <Badge variant="success">Low Priority</Badge>;
+75ceebb | UD:               <h1 className="text-lg font-bold tracking-tight text-[#0F172A]">Loan Review Desk</h1> | Badge:       return <Badge variant="success">Low Priority</Badge>;

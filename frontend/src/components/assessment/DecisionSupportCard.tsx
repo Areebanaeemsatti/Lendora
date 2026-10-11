@@ -33,43 +33,43 @@ export function DecisionSupportCard({
   };
 
   return (
-    <Card className="border-zinc-800/80">
+    <Card className="border-white/80">
       <CardHeader>
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-zinc-800 text-white flex items-center justify-center font-bold">
+          <div className="w-8 h-8 rounded-lg bg-[#0072ff]/10 text-[#0072ff] flex items-center justify-center font-bold">
             <UserCheck className="w-4 h-4" />
           </div>
           <div>
-            <CardTitle>Underwriting Decision Support &amp; Review</CardTitle>
+            <CardTitle>Credit Decision &amp; Review</CardTitle>
             <CardDescription>
-              Responsible lending framework to assist institutional risk officers
+              Clear guidelines to support fair and transparent loan decisions
             </CardDescription>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="p-4 rounded-lg bg-zinc-900/60 border border-zinc-800 text-xs text-zinc-400 leading-relaxed space-y-2">
-          <p className="font-semibold text-zinc-200 flex items-center gap-1.5">
-            <Info className="w-3.5 h-3.5 text-zinc-500" />
-            Decision Support Philosophy:
+        <div className="p-4 rounded-lg bg-white/70 border border-white/80 text-xs text-[#475569] leading-relaxed space-y-2">
+          <p className="font-semibold text-[#0F172A] flex items-center gap-1.5">
+            <Info className="w-3.5 h-3.5 text-[#475569]" />
+            Our Lending Guidelines:
           </p>
           <p>
-            Lendora provides explainable risk assessment metrics to empower human underwriters in evaluating non-traditional credit applicants. The platform does not issue automatic loan approvals or rejections, ensuring responsible and compliant credit stewardship.
+            Lendora provides clear, fair assessment factors to evaluate applicants without requiring traditional bank credit history. Final decisions ensure responsible lending and transparency for every applicant.
           </p>
         </div>
 
         {/* Underwriter Notes Input */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-300">
-            Risk Officer Evaluation Remarks (Optional)
+          <label className="text-xs font-semibold text-[#1E293B]">
+            Reviewer Remarks (Optional)
           </label>
           <textarea
             rows={3}
             value={underwriterNotes}
             onChange={(e) => setUnderwriterNotes(e.target.value)}
             placeholder="Add reviewer notes regarding income verification, utility stability, or borrower interaction..."
-            className="w-full text-xs sm:text-sm p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+            className="w-full text-xs sm:text-sm p-3 rounded-lg bg-white/70 border border-white/80 text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0072ff]/20 focus:border-[#0072ff]"
           />
         </div>
       </CardContent>
@@ -81,7 +81,7 @@ export function DecisionSupportCard({
           onClick={() => window.print()}
           leftIcon={<Printer className="w-3.5 h-3.5" />}
         >
-          Print Underwriting Summary
+          Print Assessment Summary
         </Button>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -109,7 +109,7 @@ export function DecisionSupportCard({
             variant="secondary"
             size="sm"
             onClick={handleSaveNotes}
-            leftIcon={isSaved ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <FileText className="w-3.5 h-3.5" />}
+            leftIcon={isSaved ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <FileText className="w-3.5 h-3.5" />}
           >
             {isSaved ? 'Remarks Saved' : 'Save Underwriter Remarks'}
           </Button>

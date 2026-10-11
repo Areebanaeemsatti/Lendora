@@ -159,21 +159,21 @@ const statusConfig = {
     color: 'text-emerald-500',
     bgColor: 'bg-emerald-50',
     borderColor: 'border-emerald-200',
-    badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'
+    badgeColor: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25'
   },
   delayed: {
     icon: AlertCircle,
     color: 'text-amber-500',
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-200',
-    badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/25'
+    badgeColor: 'bg-amber-500/10 text-amber-600 border-amber-500/25'
   },
   disconnected: {
     icon: XCircle,
     color: 'text-rose-500',
     bgColor: 'bg-rose-50',
     borderColor: 'border-rose-200',
-    badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/25'
+    badgeColor: 'bg-rose-500/10 text-rose-600 border-rose-500/25'
   }
 };
 
@@ -201,19 +201,19 @@ function TelecomFeedContent() {
     <AppLayout>
       <div className="space-y-6 max-w-7xl mx-auto pb-16">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-800/80 bg-zinc-900/60 rounded-lg p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/80 bg-white/70 rounded-lg p-4">
           <div>
             <div className="flex items-center gap-2">
-              <Signal className="w-4 h-4 text-emerald-400" />
-              <h2 className="text-lg font-semibold text-zinc-100 tracking-tight">
-                SME Telecom/Utility Feed
+              <Signal className="w-4 h-4 text-emerald-600" />
+              <h2 className="text-lg font-semibold text-[#0F172A] tracking-tight">
+                Telecom &amp; Utility Activity Feed
               </h2>
               <Badge variant="emerald" dot>
-                Live Monitoring
+                Live Updates
               </Badge>
             </div>
-            <p className="text-xs text-zinc-500 mt-1">
-              Real-time alternative data feeds from utility providers, telecom operators, and mobile wallet services for SME credit assessment.
+            <p className="text-xs text-[#475569] mt-1">
+              Verified activity records from utility providers, mobile operators, and digital wallets for credit evaluation.
             </p>
           </div>
         </div>
@@ -221,43 +221,43 @@ function TelecomFeedContent() {
         {/* Summary Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
-            label="Total Feeds Active"
+            label="Total Connected Accounts"
             value={String(stats.totalFeeds)}
             icon={Activity}
             color="emerald"
-            description="Data points monitored"
+            description="Verified accounts"
           />
           <MetricCard
-            label="Data Reliability Score"
+            label="Payment Reliability"
             value={`${stats.dataReliabilityScore}%`}
             icon={TrendingUp}
             color="teal"
-            description="Feed accuracy rate"
+            description="On-time payment rate"
           />
           <MetricCard
-            label="Avg Utility Delay Days"
+            label="Average Payment Delay"
             value={`${stats.avgUtilityDelayDays}d`}
             icon={Clock}
             color="amber"
-            description="Payment latency"
+            description="Days past due date"
           />
           <MetricCard
-            label="Verified Payments"
+            label="On-Time Payments"
             value={`${stats.verifiedCount}/${stats.totalFeeds}`}
             icon={CheckCircle}
             color="sky"
-            description="On-time rate"
+            description="Cleared on schedule"
           />
         </div>
 
         {/* Feed Table */}
         <Card>
-          <CardHeader className="bg-zinc-950 text-zinc-100 border-b border-zinc-800/80">
+          <CardHeader className="bg-white text-[#0F172A] border-b border-white/80">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
-                <CardTitle className="text-zinc-100">Live Data Feed Monitor</CardTitle>
-                <p className="text-zinc-500 text-xs mt-1">
-                  Recent SME transactions and bill payment status from alternative data sources
+                <CardTitle className="text-[#0F172A]">Recent Activity Records</CardTitle>
+                <p className="text-[#475569] text-xs mt-1">
+                  Recent transaction and bill payment records from connected providers
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
@@ -270,7 +270,7 @@ function TelecomFeedContent() {
                       'px-2.5 py-1 rounded-md text-xs font-medium border transition-colors capitalize',
                       filter === status
                         ? 'bg-emerald-600 text-white border-emerald-500'
-                        : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-emerald-500/40'
+                        : 'bg-white/70 text-[#475569] border-white/80 hover:border-emerald-500/40'
                     )}
                   >
                     {status === 'all' ? 'All' : status}
@@ -283,22 +283,22 @@ function TelecomFeedContent() {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-900/80 border-b border-zinc-800/80 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+                <thead className="bg-white/70 border-b border-white/80 text-[11px] font-semibold uppercase tracking-wider text-[#475569]">
                   <tr>
                     <th className="px-5 py-3.5">Provider</th>
-                    <th className="px-5 py-3.5">Business</th>
+                    <th className="px-5 py-3.5">Account Name</th>
                     <th className="px-5 py-3.5">Service Type</th>
                     <th className="px-5 py-3.5">Amount</th>
                     <th className="px-5 py-3.5">Due Date</th>
                     <th className="px-5 py-3.5">Status</th>
                     <th className="px-5 py-3.5">Reliability</th>
-                    <th className="px-5 py-3.5">Data Point</th>
+                    <th className="px-5 py-3.5">Activity Detail</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+                <tbody className="divide-y divide-slate-200/70 text-[#1E293B]">
                   {filteredFeeds.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="px-5 py-10 text-center text-sm text-zinc-400">
+                      <td colSpan={8} className="px-5 py-10 text-center text-sm text-[#475569]">
                         No feeds found for this filter.
                       </td>
                     </tr>
@@ -309,24 +309,24 @@ function TelecomFeedContent() {
                     const StatusIcon = status.icon;
 
                     return (
-                      <tr key={feed.id} className="hover:bg-zinc-800/30 transition-colors">
+                      <tr key={feed.id} className="hover:bg-slate-100 transition-colors">
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <Icon className="w-4 h-4 text-zinc-500" />
-                            <span className="font-semibold text-zinc-100">{feed.provider}</span>
+                            <Icon className="w-4 h-4 text-[#475569]" />
+                            <span className="font-semibold text-[#0F172A]">{feed.provider}</span>
                           </div>
-                          <div className="text-[11px] font-mono text-zinc-500 mt-0.5">{feed.accountNumber}</div>
+                          <div className="text-[11px] font-mono text-[#475569] mt-0.5">{feed.accountNumber}</div>
                         </td>
                         <td className="px-5 py-4">
-                          <div className="font-medium text-zinc-100">{feed.businessName}</div>
+                          <div className="font-medium text-[#0F172A]">{feed.businessName}</div>
                         </td>
                         <td className="px-5 py-4">
-                          <span className="text-xs text-zinc-400 capitalize">{feed.serviceType.replace('_', ' ')}</span>
+                          <span className="text-xs text-[#475569] capitalize">{feed.serviceType.replace('_', ' ')}</span>
                         </td>
-                        <td className="px-5 py-4 font-mono font-semibold text-zinc-100">
+                        <td className="px-5 py-4 font-mono font-semibold text-[#0F172A]">
                           {formatPKR(feed.amountPKR)}
                         </td>
-                        <td className="px-5 py-4 text-zinc-400">
+                        <td className="px-5 py-4 text-[#475569]">
                           {feed.dueDate}
                         </td>
                         <td className="px-5 py-4">
@@ -340,7 +340,7 @@ function TelecomFeedContent() {
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-16 bg-zinc-800 rounded-full h-2 overflow-hidden">
+                            <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
                               <div
                                 className={cn(
                                   'h-full rounded-full',
@@ -350,11 +350,11 @@ function TelecomFeedContent() {
                                 style={{ width: `${feed.reliabilityScore}%` }}
                               />
                             </div>
-                            <span className="text-xs font-medium text-zinc-400">{feed.reliabilityScore}%</span>
+                            <span className="text-xs font-medium text-[#475569]">{feed.reliabilityScore}%</span>
                           </div>
                         </td>
                         <td className="px-5 py-4">
-                          <span className="text-xs text-zinc-400">{feed.dataPoint}</span>
+                          <span className="text-xs text-[#475569]">{feed.dataPoint}</span>
                         </td>
                       </tr>
                     );
@@ -366,20 +366,20 @@ function TelecomFeedContent() {
         </Card>
 
         {/* Status Legend */}
-        <Card className="bg-zinc-900/60 border-zinc-800/80">
+        <Card className="bg-white/70 border-white/80">
           <CardContent className="p-4">
             <div className="flex flex-wrap items-center gap-6 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                <span className="text-zinc-400"><strong className="text-zinc-200">Verified:</strong> Payment received on or before due date</span>
+                <span className="text-[#475569]"><strong className="text-[#0F172A]">Verified:</strong> Payment received on or before due date</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <span className="text-zinc-400"><strong className="text-zinc-200">Delayed:</strong> Payment received after due date</span>
+                <span className="text-[#475569]"><strong className="text-[#0F172A]">Delayed:</strong> Payment received after due date</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-rose-500" />
-                <span className="text-zinc-400"><strong className="text-zinc-200">Disconnected:</strong> Service suspended due to non-payment</span>
+                <span className="text-[#475569]"><strong className="text-[#0F172A]">Disconnected:</strong> Service suspended due to non-payment</span>
               </div>
             </div>
           </CardContent>
@@ -403,22 +403,22 @@ function MetricCard({
   description: string;
 }) {
   const colorClasses = {
-    emerald: 'text-emerald-400',
-    teal: 'text-teal-400',
-    amber: 'text-amber-400',
+    emerald: 'text-emerald-600',
+    teal: 'text-teal-600',
+    amber: 'text-amber-600',
     sky: 'text-sky-400',
   };
 
   return (
-    <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/50 px-4 py-3">
+    <div className="rounded-lg border border-white/80 bg-white/70 px-4 py-3">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[11px] uppercase tracking-wider font-semibold text-zinc-400">{label}</p>
+        <p className="text-[11px] uppercase tracking-wider font-semibold text-[#475569]">{label}</p>
         <Icon className={cn('w-4 h-4', colorClasses[color])} />
       </div>
       <p className={cn('text-2xl font-bold tracking-tight font-mono', colorClasses[color])}>
         {value}
       </p>
-      <p className="text-[11px] text-zinc-500 mt-0.5">{description}</p>
+      <p className="text-[11px] text-[#475569] mt-0.5">{description}</p>
     </div>
   );
 }

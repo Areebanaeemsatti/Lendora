@@ -1,0 +1,9 @@
+﻿no write_to_file hits; now scanning replace_file_content:
+L185 len=1870
+L186 len=1086
+L199 len=3334
+L500 len=7413
+L501 len=3532
+L502 len=1104
+L503 len=1152
+L538 len=11992

@@ -1,0 +1,4 @@
+﻿history root: C:\Users\WK Traders\AppData\Roaming\Code\User\History
+exists: True
+entries.json count: 43
+--- matching entries ---

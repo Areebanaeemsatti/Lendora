@@ -1,0 +1,5 @@
+﻿ frontend/src/app/risk-assessments/page.tsx         |   2 +-
+ .../assessment/AssessmentSummaryCard.tsx           |   4 +-
+ .../components/dashboard/UnderwriterDashboard.tsx  | 453 ++++++++++++---------
+ frontend/src/components/ui/Badge.tsx               |   8 +-
+ 4 files changed, 259 insertions(+), 208 deletions(-)

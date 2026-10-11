@@ -1,0 +1,96 @@
+﻿ M backend/routers/credit.py
+ D data/lendora_demo_borrowers_50.csv
+ D frontend/landing-probe.txt
+ M frontend/next-env.d.ts
+ M frontend/package-lock.json
+ M frontend/package.json
+ D frontend/port-check.txt
+ D frontend/src/app/auth/AuthPage.tsx
+ M frontend/src/app/auth/page.tsx
+ M frontend/src/app/globals.css
+ M frontend/src/app/layout.tsx
+ M frontend/src/app/page.tsx
+ M frontend/src/app/risk-assessments/page.tsx
+ M frontend/src/app/telecom-feed/page.tsx
+ M frontend/src/components/ProtectedRoute.tsx
+ M frontend/src/components/ShapModal.tsx
+ M frontend/src/components/application/AlternativeSignalsSection.tsx
+ M frontend/src/components/application/ApplicationProgress.tsx
+ M frontend/src/components/application/BasicInfoSection.tsx
+ M frontend/src/components/application/BorrowerForm.tsx
+ M frontend/src/components/application/FinancialProfileSection.tsx
+ M frontend/src/components/application/OptionalCreditSection.tsx
+ M frontend/src/components/application/SupportingDocumentsSection.tsx
+ M frontend/src/components/assessment/AlternativeSignalsCard.tsx
+ M frontend/src/components/assessment/ApplicationSwitcher.tsx
+ M frontend/src/components/assessment/AssessmentSummaryCard.tsx
+ M frontend/src/components/assessment/BorrowerOverviewCard.tsx
+ M frontend/src/components/assessment/DecisionSupportCard.tsx
+ M frontend/src/components/assessment/FinancialProfileCard.tsx
+ M frontend/src/components/assessment/RepaymentBehaviorCard.tsx
+ M frontend/src/components/assessment/ShapModal.tsx
+ M frontend/src/components/assessment/SupportingEvidenceCard.tsx
+ M frontend/src/components/dashboard/DashboardView.tsx
+ M frontend/src/components/dashboard/HeroCarousel.tsx
+ D frontend/src/components/dashboard/ModelHealthWidget.tsx
+ D frontend/src/components/dashboard/PortfolioStats.tsx
+ D frontend/src/components/dashboard/RecentAssessmentsTable.tsx
+ M frontend/src/components/dashboard/UnderwriterDashboard.tsx
+ M frontend/src/components/layout/AppLayout.tsx
+ M frontend/src/components/layout/Header.tsx
+ M frontend/src/components/layout/LogoMark.tsx
+ M frontend/src/components/layout/MobileNav.tsx
+ M frontend/src/components/layout/navConfig.ts
+ M frontend/src/components/providers/ApplicationsProvider.tsx
+ M frontend/src/components/ui/Badge.tsx
+ M frontend/src/components/ui/Button.tsx
+ M frontend/src/components/ui/Card.tsx
+ M frontend/src/components/ui/Input.tsx
+ M frontend/src/components/ui/Select.tsx
+ M frontend/src/components/ui/StatCard.tsx
+ M frontend/src/lib/auth.ts
+ M frontend/src/lib/dataset.ts
+ M frontend/src/lib/mockData.ts
+ D frontend/src/pages/LandingPage.tsx
+ M frontend/tsconfig.tsbuildinfo
+ M scripts/sync_dataset.py
+?? frontend/head_badge.tsx
+?? frontend/head_riskpage.tsx
+?? frontend/head_summary.tsx
+?? frontend/head_underwriter.tsx
+?? frontend/headcheck.txt
+?? frontend/route_check.txt
+?? frontend/server_status.txt
+?? frontend/src/app/underwriter/
+?? frontend/src/components/dashboard/BorrowerStatusBanner.tsx
+?? frontend/src/components/dashboard/CountUp.tsx
+?? frontend/src/components/dashboard/OverviewTab.tsx
+?? frontend/src/components/dashboard/ProfileTab.tsx
+?? frontend/src/components/dashboard/SettingsTab.tsx
+?? frontend/src/components/dashboard/TransactionsTab.tsx
+?? frontend/src/components/dashboard/UnderwriterDesk.tsx
+?? frontend/src/components/landing/
+?? frontend/src/components/providers/SessionProvider.tsx
+?? frontend/src/config/
+?? frontend/src/lib/consumerData.ts
+?? frontend/src/lib/sharedQueue.ts
+?? git_probe_log.txt
+?? git_probe_status.txt
+?? git_status_now.txt
+?? hist3.txt
+?? hist_probe.txt
+?? live_underwriter.html
+?? log_now.txt
+?? logscan.txt
+?? onedrive_probe.txt
+?? peek.txt
+?? probe.txt
+?? stash_now.txt
+?? tx318.txt
+?? tx354.txt
+?? tx354c.txt
+?? tx354keys.txt
+?? txindex.txt
+?? txpaths.txt
+?? txscan.txt
+?? vshist2.txt

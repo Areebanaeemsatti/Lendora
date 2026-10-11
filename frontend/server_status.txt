@@ -1,0 +1,15 @@
+﻿=== netstat 3000 ===
+  TCP    0.0.0.0:3000           0.0.0.0:0              LISTENING       21200
+  TCP    [::]:3000              [::]:0                 LISTENING       21200
+=== dev log tail ===
+
+> lendora@0.1.0 dev
+> next dev --webpack
+
+â–² Next.js 16.3.3 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.137.1:3000
+- Environments: .env.local
+âœ“ Ready in 471ms
+âœ“ Running next.config.ts took 39ms
+

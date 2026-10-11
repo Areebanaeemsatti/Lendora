@@ -1,0 +1,22 @@
+﻿OneDrive Lendora exists: True
+--- top level ---
+.git
+dist
+node_modules
+src
+.gitignore
+index.html
+package-lock.json
+package.json
+postcss.config.js
+README.md
+tailwind.config.js
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+--- src/components/underwriter ---
+ApplicantInspector.tsx
+ApplicationQueue.tsx
+RiskTierBadge.tsx
+ShapWaterfallChart.tsx
+UnderwritingControls.tsx

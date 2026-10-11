@@ -1,0 +1,20 @@
+﻿=== 75ceebb (wahay run=7) Badge.tsx labels ===
+
+import { RiskTier, ApplicationStatus } from '@/types';
+export function RiskTierBadge({ tier }: { tier?: RiskTier }) {
+  if (!tier) return <span className="text-[#475569] text-xs">Unscored</span>;
+  switch (tier) {
+      return <Badge variant="success">Low Priority</Badge>;
+      return <Badge variant="info">Standard Priority</Badge>;
+      return <Badge variant="warning">Elevated Priority</Badge>;
+      return <Badge variant="danger">High Review Priority</Badge>;
+      return <Badge variant="default">{tier}</Badge>;
+=== 75ceebb UnderwriterDashboard exists? ===
+'use client';
+
+import React, { useEffect, useMemo, useState } from 'react';
+=== 75ceebb UnderwriterDashboard jargon ===
+  { label: 'Payment History Feed', href: '/telecom-feed' },
+              <h1 className="text-lg font-bold tracking-tight text-[#0F172A]">Loan Review Desk</h1>
+
+

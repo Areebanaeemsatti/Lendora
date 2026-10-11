@@ -1,0 +1,7 @@
+﻿01978162-227f-4db9-83c6-69c52b1094eb.db | RISKDESK:False | scratchlendora:False
+29a1ac39-afc2-4eab-a47a-83bea734f6b1.db | RISKDESK:False | scratchlendora:True
+2a222f81-6ccc-4267-9a15-5eb3706f88b9.db | RISKDESK:False | scratchlendora:False
+33f42333-e0f0-498a-b94a-0bc97124a98b.db | RISKDESK:False | scratchlendora:False
+6d2d15b5-b4fd-4891-a456-595f85836b79.db | RISKDESK:True | scratchlendora:False
+d263a9e9-6678-4fcc-b415-7ebd867fdc01.db | RISKDESK:False | scratchlendora:False
+ef92c2f9-8022-43a5-8cb8-f1891826ff1a.db | RISKDESK:False | scratchlendora:True

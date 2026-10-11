@@ -62,7 +62,8 @@ async def assess_credit_score(borrower: BorrowerInput) -> RiskAssessmentResponse
     status_code=status.HTTP_200_OK,
     summary="Get Sample Borrower Profiles for Testing",
     description="""
-Reads 3 to 5 realistic borrower profiles directly from the mock CSV dataset (lendora_demo_borrowers_50.csv)
+Reads 3 to 5 realistic borrower profiles directly from the trained ML dataset
+(ml/data/pk_alt_data_synthetic3.csv)
 so the frontend can immediately fetch and display test data.
 """
 )

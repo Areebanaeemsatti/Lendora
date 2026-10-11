@@ -1,0 +1,11 @@
+﻿ frontend/next-env.d.ts                             |   4 +-
+ frontend/src/app/auth/page.tsx                     | 228 +++++++++++++++++++++
+ frontend/src/components/ShapModal.tsx              |  16 +-
+ .../src/components/application/BorrowerForm.tsx    |   4 +-
+ .../assessment/AssessmentSummaryCard.tsx           |  18 +-
+ .../src/components/dashboard/DashboardView.tsx     |   4 +
+ .../components/dashboard/UnderwriterDashboard.tsx  |  20 +-
+ .../components/providers/ApplicationsProvider.tsx  | 128 +++++-------
+ frontend/src/lib/auth.ts                           |  21 ++
+ frontend/src/lib/mockData.ts                       |  25 ++-
+ 10 files changed, 355 insertions(+), 113 deletions(-)

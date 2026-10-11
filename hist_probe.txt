@@ -1,0 +1,17 @@
+﻿=== VS Code history exists: True
+=== .gemini dirs ===
+C:\Users\WK Traders\.gemini\antigravity
+C:\Users\WK Traders\.gemini\antigravity-ide
+C:\Users\WK Traders\.gemini\config
+C:\Users\WK Traders\.gemini\u0007ntigravity
+C:\Users\WK Traders\.gemini\antigravity\annotations
+C:\Users\WK Traders\.gemini\antigravity\bin
+C:\Users\WK Traders\.gemini\antigravity\brain
+C:\Users\WK Traders\.gemini\antigravity\builtin
+C:\Users\WK Traders\.gemini\antigravity\cache
+C:\Users\WK Traders\.gemini\antigravity\conversations
+C:\Users\WK Traders\.gemini\antigravity\crashes
+C:\Users\WK Traders\.gemini\antigravity\knowledge
+C:\Users\WK Traders\.gemini\antigravity\lib
+C:\Users\WK Traders\.gemini\antigravity\plugin_data
+C:\Users\WK Traders\.gemini\antigravity\scratch

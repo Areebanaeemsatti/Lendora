@@ -20,14 +20,14 @@ export function AlternativeSignalsSection({ formData, errors, onChange }: Props)
               <Activity className="w-4 h-4" />
             </div>
             <div>
-              <CardTitle>Section 3: Digital Financial Activity (Alternative Signals)</CardTitle>
+              <CardTitle>Section 3: Daily Digital &amp; Wallet Activity</CardTitle>
               <CardDescription>
-                High-frequency mobile wallet, telco recharge, and utility payment signals
+                Mobile wallet usage, phone recharges, and regular utility bill payments
               </CardDescription>
             </div>
           </div>
           <span className="hidden sm:inline-flex text-[11px] font-semibold bg-teal-500/10 text-teal-400 px-2.5 py-0.5 rounded-full border border-teal-500/25">
-            Pakistan Informal Economy
+            Digital Payment Habits
           </span>
         </div>
       </CardHeader>
@@ -44,7 +44,7 @@ export function AlternativeSignalsSection({ formData, errors, onChange }: Props)
             error={errors.monthlyEasypaisaTxCount}
             placeholder="e.g. 18"
             min={0}
-            helperText="Number of inbound/outbound mobile wallet transactions per month."
+            helperText="Number of transactions made using Easypaisa per month."
           />
 
           <Input
@@ -58,7 +58,7 @@ export function AlternativeSignalsSection({ formData, errors, onChange }: Props)
             error={errors.monthlyJazzCashTxCount}
             placeholder="e.g. 12"
             min={0}
-            helperText="Monthly volume of digital wallet transactions on JazzCash."
+            helperText="Number of transactions made using JazzCash per month."
           />
 
           <Input
@@ -72,7 +72,7 @@ export function AlternativeSignalsSection({ formData, errors, onChange }: Props)
             error={errors.monthlyMobileRechargePKR}
             placeholder="e.g. 2500"
             min={0}
-            helperText="Average expenditure on mobile telco airtime and data bundles."
+            helperText="Monthly spend on phone recharges and mobile packages."
           />
 
           <Input
@@ -87,7 +87,7 @@ export function AlternativeSignalsSection({ formData, errors, onChange }: Props)
             placeholder="e.g. 90"
             min={0}
             max={100}
-            helperText="Percentage of electricity (DISCOs), gas (SSGC/SNGPL), and water bills settled on time."
+            helperText="Estimated percentage of utility bills paid on or before the due date."
           />
 
           <Input
@@ -101,7 +101,7 @@ export function AlternativeSignalsSection({ formData, errors, onChange }: Props)
             error={errors.monthlyUtilityBillPKR}
             placeholder="e.g. 14000"
             min={0}
-            helperText="Average aggregate monthly electricity and gas bill amount in PKR."
+            helperText="Average monthly total for electricity, gas, and water bills."
           />
         </div>
       </CardContent>

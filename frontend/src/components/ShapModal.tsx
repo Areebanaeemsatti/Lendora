@@ -78,24 +78,24 @@ export function ShapModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 overflow-y-auto">
-      <Card className="w-full max-w-2xl max-h-[92vh] flex flex-col bg-zinc-900 border-zinc-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <CardHeader className="bg-zinc-950 border-b border-zinc-800 px-6 py-4 shrink-0">
+      <Card className="w-full max-w-2xl max-h-[92vh] flex flex-col bg-white/70 border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <CardHeader className="bg-white border-b border-white/80 px-6 py-4 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
                 <Scale className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-white text-lg font-bold">
-                    SHAP Credit Score Explainability
+                  <CardTitle className="text-[#0F172A] text-lg font-bold">
+                    What Affected Your Score
                   </CardTitle>
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-700 border border-emerald-500/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Live ML Attribution
+                    Your details
                   </span>
                 </div>
-                <p className="text-zinc-400 text-xs mt-0.5">{applicantName}</p>
+                <p className="text-[#475569] text-xs mt-0.5">{applicantName}</p>
               </div>
             </div>
             <Button
@@ -103,7 +103,7 @@ export function ShapModal({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-zinc-400 hover:text-white hover:bg-zinc-800"
+              className="text-[#475569] hover:text-[#0F172A] hover:bg-slate-100"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -113,42 +113,42 @@ export function ShapModal({
         <CardContent className="p-4 overflow-y-auto space-y-5">
           {/* Score Summary Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="bg-zinc-800/60 rounded-xl p-4 border border-zinc-700/60 flex flex-col justify-between">
-              <p className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Base Population Score</p>
+            <div className="bg-slate-100 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
+              <p className="text-[11px] text-[#475569] font-semibold uppercase tracking-wider">Starting Score</p>
               <div className="my-1.5">
-                <p className="text-2xl sm:text-3xl font-bold font-mono text-zinc-200">{baseScore}</p>
+                <p className="text-2xl sm:text-3xl font-bold font-mono text-[#0F172A]">{baseScore}</p>
               </div>
-              <p className="text-[10px] text-zinc-400">Baseline prior before features</p>
+              <p className="text-[10px] text-[#475569]">Where everyone begins</p>
             </div>
 
-            <div className="bg-zinc-800/60 rounded-xl p-4 border border-zinc-700/60 flex flex-col justify-between">
-              <p className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">Total SHAP Drivers</p>
+            <div className="bg-slate-100 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
+              <p className="text-[11px] text-[#475569] font-semibold uppercase tracking-wider">Changes From Your Habits</p>
               <div className="my-1.5 flex items-center gap-2">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-400">+{totalPositive}</span>
-                <span className="text-zinc-400 font-bold">/</span>
-                <span className="text-xl sm:text-2xl font-bold font-mono text-rose-400">-{totalNegative}</span>
+                <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-600">+{totalPositive}</span>
+                <span className="text-[#475569] font-bold">/</span>
+                <span className="text-xl sm:text-2xl font-bold font-mono text-rose-600">-{totalNegative}</span>
               </div>
-              <p className="text-[10px] text-zinc-400">Cumulative points adjustment</p>
+              <p className="text-[10px] text-[#475569]">Added and subtracted</p>
             </div>
 
-            <div className="bg-emerald-950/40 rounded-xl p-4 border border-emerald-700/50 flex flex-col justify-between shadow-inner">
-              <p className="text-[11px] text-emerald-400 font-semibold uppercase tracking-wider">Final Alt Credit Score</p>
+            <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200 flex flex-col justify-between">
+              <p className="text-[11px] text-emerald-600 font-semibold uppercase tracking-wider">Your Credit Score</p>
               <div className="my-1.5">
-                <p className="text-2xl sm:text-3xl font-bold font-mono text-emerald-300">{altCreditScore}</p>
+                <p className="text-2xl sm:text-3xl font-bold font-mono text-emerald-700">{altCreditScore}</p>
               </div>
-              <p className="text-[10px] text-emerald-400 font-medium">Calibrated (300 to 850)</p>
+              <p className="text-[10px] text-emerald-600 font-medium">Score range (300 to 850)</p>
             </div>
           </div>
 
           {/* Feature Impact Bars */}
           <div className="space-y-3.5">
-            <div className="flex items-center justify-between pb-1 border-b border-zinc-800">
-              <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
-                Live Feature Contribution Visualizer
+            <div className="flex items-center justify-between pb-1 border-b border-white/80">
+              <h3 className="text-sm font-semibold text-[#0F172A] flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                What Helped and What Hurt
               </h3>
-              <span className="text-xs text-zinc-400">
-                {normalizedFeatures.length} evaluated signals
+              <span className="text-xs text-[#475569]">
+                {normalizedFeatures.length} things we looked at
               </span>
             </div>
 
@@ -160,23 +160,23 @@ export function ShapModal({
                 return (
                   <div
                     key={`${feature.featureName}-${idx}`}
-                    className="bg-zinc-800/40 hover:bg-zinc-800/70 transition-colors rounded-xl p-3.5 border border-zinc-700/60 space-y-2"
+                    className="bg-slate-100 hover:bg-slate-100 transition-colors rounded-xl p-3.5 border border-slate-200 space-y-2"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                       <div className="flex items-center gap-2">
                         {isPositive ? (
-                          <div className="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                          <div className="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-600 flex items-center justify-center shrink-0">
                             <TrendingUp className="w-3.5 h-3.5" />
                           </div>
                         ) : (
-                          <div className="w-6 h-6 rounded-md bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                          <div className="w-6 h-6 rounded-md bg-rose-500/20 text-rose-600 flex items-center justify-center shrink-0">
                             <TrendingDown className="w-3.5 h-3.5" />
                           </div>
                         )}
                         <div>
-                          <span className="text-sm font-semibold text-zinc-200">{feature.featureName}</span>
+                          <span className="text-sm font-semibold text-[#0F172A]">{feature.featureName}</span>
                           {feature.rawValue !== '' && (
-                            <span className="ml-2 text-[11px] font-mono text-zinc-400 bg-zinc-900/60 px-2 py-0.5 rounded border border-zinc-700/50">
+                            <span className="ml-2 text-[11px] font-mono text-[#475569] bg-white/70 px-2 py-0.5 rounded border border-slate-200">
                               Value: {String(feature.rawValue)}
                             </span>
                           )}
@@ -184,15 +184,15 @@ export function ShapModal({
                       </div>
 
                       <div className="flex items-center gap-2 self-end sm:self-auto">
-                        <span className="text-[10px] text-zinc-400 uppercase tracking-wider hidden sm:inline">
+                        <span className="text-[10px] text-[#475569] uppercase tracking-wider hidden sm:inline">
                           {feature.category}
                         </span>
                         <span
                           className={cn(
                             'text-sm font-bold font-mono px-2 py-0.5 rounded border',
                             isPositive
-                              ? 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30'
-                              : 'text-rose-300 bg-rose-500/10 border-rose-500/30'
+                              ? 'text-emerald-700 bg-emerald-500/10 border-emerald-500/30'
+                              : 'text-rose-700 bg-rose-500/10 border-rose-500/30'
                           )}
                         >
                           {isPositive ? '+' : ''}
@@ -202,7 +202,7 @@ export function ShapModal({
                     </div>
 
                     {/* Progress Bar with Emerald (Positive) or Rose/Amber (Negative) indicator */}
-                    <div className="w-full bg-zinc-950/80 rounded-full h-2 overflow-hidden border border-zinc-700/40">
+                    <div className="w-full bg-white/60 rounded-full h-2 overflow-hidden border border-slate-200">
                       <div
                         className={cn(
                           'h-full rounded-full transition-all duration-700 ease-out',
@@ -215,7 +215,7 @@ export function ShapModal({
                     </div>
 
                     {feature.explanation && (
-                      <p className="text-xs text-zinc-400 leading-relaxed pt-0.5">
+                      <p className="text-xs text-[#475569] leading-relaxed pt-0.5">
                         {feature.explanation}
                       </p>
                     )}
@@ -226,19 +226,19 @@ export function ShapModal({
           </div>
 
           {/* Explanatory Footer */}
-          <div className="p-4 bg-zinc-950/60 rounded-xl border border-zinc-800 text-xs text-zinc-400 space-y-1.5">
-            <div className="flex items-center gap-2 text-zinc-300 font-semibold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Interpreting SHAP Alternative Scoring Weights</span>
+          <div className="p-4 bg-white/60 rounded-xl border border-white/80 text-xs text-[#475569] space-y-1.5">
+            <div className="flex items-center gap-2 text-[#1E293B] font-semibold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Understanding Your Score Factors</span>
             </div>
             <p className="leading-relaxed">
-              <strong className="text-emerald-400">Emerald indicators</strong> indicate positive feature attributions that elevate the borrower score, reflecting dependable mobile wallet flow and utility discipline.
-              <strong className="text-rose-400"> Red/amber indicators</strong> signal risk deductions based on thin formal credit records or high leverage.
+              <strong className="text-emerald-600">Emerald indicators</strong> show positive financial habits that strengthen your score, reflecting active mobile wallet usage and consistent bill payments.
+              <strong className="text-rose-600"> Red or amber indicators</strong> highlight areas that reduce your score, such as higher existing commitments or limited payment records.
             </p>
           </div>
         </CardContent>
 
-        <div className="bg-zinc-950 border-t border-zinc-800 px-4 py-3 flex justify-end shrink-0">
+        <div className="bg-white border-t border-white/80 px-4 py-3 flex justify-end shrink-0">
           <Button type="button" variant="primary" size="sm" onClick={onClose}>
             Done Reviewing
           </Button>

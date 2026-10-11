@@ -1,0 +1,129 @@
+﻿=== all branches ===
+* feature/nextjs-portal
+  main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/feature/fastapi-backend
+  remotes/origin/feature/nextjs-portal
+  remotes/origin/main
+=== all refs log ===
+75ceebb cline checkpoint session=1791656036359_wahay run=7
+4e07dbb index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+d2839f0 untracked files on cline checkpoint
+a5311d5 cline checkpoint session=1791656036359_wahay run=6
+3cf9c20 untracked files on cline checkpoint
+367e99a index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+b18cd35 cline checkpoint session=1791656036359_wahay run=5
+ae36e0b untracked files on cline checkpoint
+999d6f6 index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+cdbc82e cline checkpoint session=1791656036359_wahay run=4
+5ea6bca index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+7a2597b untracked files on cline checkpoint
+32323a2 cline checkpoint session=1791656036359_wahay run=3
+c0cb32b index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+bdd60b3 untracked files on cline checkpoint
+b1f09ca cline checkpoint session=1791656036359_wahay run=2
+eb91b9e index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+995b93b untracked files on cline checkpoint
+30a9b7b cline checkpoint session=1791656036359_wahay run=1
+5735cd4 untracked files on cline checkpoint
+57eff41 index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+cb9ad6d cline checkpoint session=1791539117406_ksmt8 run=1
+f516500 untracked files on cline checkpoint
+3e5d937 index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+d2379ad cline checkpoint session=1791461125762_tnxpu run=7
+e3e2bc1 untracked files on cline checkpoint
+356851e index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+670ef8d cline checkpoint session=1791461125762_tnxpu run=6
+b6e4fec index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+3574aaf untracked files on cline checkpoint
+b036273 cline checkpoint session=1791461125762_tnxpu run=5
+bfc2172 untracked files on cline checkpoint
+ae0428d index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+55d0ed0 cline checkpoint session=1791461125762_tnxpu run=4
+d0431e3 index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+6003815 untracked files on cline checkpoint
+3f9223a On feature/nextjs-portal: cline checkpoint session=1791461125762_tnxpu run=3
+5a21780 index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+e4a30f0 cline checkpoint session=1791461125762_tnxpu run=2
+e661efa untracked files on cline checkpoint
+5b86a33 index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+09b2d5f On feature/nextjs-portal: cline checkpoint session=1791461125762_tnxpu run=1
+b6bbf05 index on feature/nextjs-portal: e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+accf41e chore: trigger fresh vercel deployment
+9c08a57 refactor: improve UI usability and humanize SHAP breakdown
+8e0cef4 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+6652132 Update README.md
+f19317d Create README.md
+e4cdc68 Fix routing, module path aliases, and add Pakistani CNIC/mobile auth validation
+2d14223 cline checkpoint session=1788798553441_m3y2y run=1
+9897ae1 index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+a0bab8d untracked files on cline checkpoint
+05e9f8b cline checkpoint session=1788798517608_qzi1v run=1
+b3ce243 index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+a3226d2 untracked files on cline checkpoint
+7e53fd1 cline checkpoint session=1788713544031_f1stc run=6
+960c7b8 untracked files on cline checkpoint
+15386e3 index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+9d2e3cd cline checkpoint session=1788713544031_f1stc run=5
+0aedf95 index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+7f5fccf untracked files on cline checkpoint
+a2e9e40 cline checkpoint session=1788713544031_f1stc run=4
+56b1fee index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+01cbf07 untracked files on cline checkpoint
+e90f0ff On feature/nextjs-portal: cline checkpoint session=1788713544031_f1stc run=3
+a277965 index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+242f984 On feature/nextjs-portal: cline checkpoint session=1788713544031_f1stc run=2
+70f9c99 index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+8714fad On feature/nextjs-portal: cline checkpoint session=1788713544031_f1stc run=1
+7a958ae index on feature/nextjs-portal: be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+30c07a0 Merge pull request #5 from Areebanaeemsatti/feature/nextjs-portal
+be23d5b feat(frontend): complete Step 03 - FastAPI ML endpoint integration, SHAP binding & README update
+45b2c12 feat(frontend): complete Step 03 - FastAPI ML backend endpoint integration & live SHAP rendering
+02bce4d feat(backend): implement ML model integration, lifespan preloading, and SHAP TreeExplainer inference
+94ce7d3 Add gitignore for local test files
+ad0b840 Updated Complete credit risk ML pipeline
+c43a0a3 Update hackathon name to Alibaba Hackathon 2026
+f18909b Update readme.md
+775ab46 Create readme.md
+af4dd6a Update EDA
+989a2dc Add Lendora ML credit risk pipeline
+5fe4f26 Merge pull request #4 from Areebanaeemsatti/feature/nextjs-portal
+b618a0d Merge remote-tracking branch 'origin/main' into feature/nextjs-portal
+4190ab3 feat(frontend): complete Step 02 - borrower form, underwriter dashboard & SHAP visualizer
+4f6c428 chore: add root and backend .gitignore, untrack venv and pycache from repository
+e413157 feat(backend): implemented feature engineering, exception handling and inference wrapper on mock data
+b361bb6 chore: remove venv from tracking
+cc92902 Merge remote-tracking branch 'origin/feature/fastapi-backend' into feature/nextjs-portal
+4deb8e2 Merge pull request #3 from Areebanaeemsatti/feature/fastapi-backend
+96bd8ea Merge pull request #1 from Areebanaeemsatti/feature/nextjs-portal
+ceced41 Merge branch 'main' of https://github.com/Areebanaeemsatti/Lendora into feature/nextjs-portal
+349288e feat(frontend): setup Next.js project and initial UI with mock data
+fe51c4f feat(backend): init fastapi and build mock data endpoints
+95b31ab Add directory structure for ml, backend, and frontend
+769d098 chore: initial repo setup with folders and mock dataset
+a1f3341 Add files via upload
+0b0633a Delete .gitignore
+9083aea Delete .gitattributes
+6914600 Delete LICENSE
+96c5870 Delete README.md
+d3c15ef Initial commit
+=== dangling ===
+dangling commit 7f046b5d34a941cce33f103056e6b4c9391a0ad1
+dangling commit 0a85a79a00db30cdbc805e5d48d5676c2100ac1a
+dangling commit a9898376f388b18211f14897e839f4749dcd65f6
+dangling commit 2f8b21dc47c6af164713db2022a971dee80383c0
+dangling commit d40c5fe31b014a9f84cdb49b9f347e7bee8b03a4
+dangling commit 400f2a49a81b627551c1b5dd96d31d7ca3670017
+dangling commit 7713f4950e3d7bcfbcb9554e65069b657c9c435f
+dangling commit 7097b8eb92a1ffbf3cae41bd38631cb5aabe3cba
+dangling commit e8264e14aa8cc34e04d9a8e2b0770b9155c48463
+dangling commit 8fb5a0c5064bd5e6394a8d8eae89605b3b948cf3
+dangling commit fb45a7a314e319d744472dc3bd25dae1a6751731
+dangling commit 27c771a805d80c5d4742d2bcf4c04cccfa01ebf1
+dangling commit db4a7a0118c6cf2a78cfd1549ea92155fedcdfc7
+dangling commit c64d3871228ec3bea8a164a816ccf0dc06846254
+dangling commit e35cefca01ab8675b4ecc7ec42d7a911d764e1d5
+dangling commit d6e2f00ed28e42c1e72b961f3ace78215ba96b92
+dangling commit ad63c39fe8c80a7907b428d8fa1c0d111ee31b01
+dangling commit 0971c670792531d7f193bd0ba7f12bf2b4aa9f6c
+dangling commit 24f21ca4bdf5c41283e5c920e97afcdbf4e39a0c

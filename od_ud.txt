@@ -1,0 +1,59 @@
+﻿import React from 'react';
+import { Header } from '../components/common/Header';
+import { Footer } from '../components/common/Footer';
+import { ApplicationQueue } from '../components/underwriter/ApplicationQueue';
+import { ApplicantInspector } from '../components/underwriter/ApplicantInspector';
+import { ShapWaterfallChart } from '../components/underwriter/ShapWaterfallChart';
+import { UnderwritingControls } from '../components/underwriter/UnderwritingControls';
+import { useUnderwriter } from '../context/underwriterContext';
+
+export const UnderwriterDashboard: React.FC = () => {
+  const { selectedApplicant } = useUnderwriter();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#F4F8FB] via-[#EBF3F9] to-[#E2EEF7] text-[#0F172A] flex flex-col">
+      {/* Header with Switch Portal View */}
+      <Header />
+
+      {/* Workspace Summary */}
+      <div className="bg-white/70 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-2.5 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-slate-700">
+            <span className="font-semibold">Application review workspace</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main High-Density Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* Left Column: Application Queue (4 cols) */}
+          <div className="lg:col-span-4 h-[calc(100vh-160px)] sticky top-20">
+            <ApplicationQueue />
+          </div>
+
+          {/* Right column: applicant overview and controls */}
+          <div className="lg:col-span-8 space-y-4">
+            {selectedApplicant ? (
+              <>
+                <ApplicantInspector applicant={selectedApplicant} />
+                <ShapWaterfallChart
+                  factors={selectedApplicant.shapFactors}
+                  finalScore={selectedApplicant.creditScore}
+                />
+                <UnderwritingControls applicant={selectedApplicant} />
+              </>
+            ) : (
+              <div className="p-12 rounded-2xl bg-white/70 backdrop-blur-md border border-white/80 text-center text-slate-500 shadow-sm">
+                Please select an applicant from the queue on the left to inspect risk metrics.
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <Footer theme="light" />
+    </div>
+  );
+};

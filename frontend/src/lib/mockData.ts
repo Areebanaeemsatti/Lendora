@@ -1,7 +1,25 @@
 import type { ApplicationStatus, RiskTier, ShapFeature, ShapValueItem, RiskAssessmentResponse } from '@/types';
 
-export type LoanStatus = 'pending' | 'approved' | 'rejected';
+export type LoanStatus = 'pending' | 'approved' | 'rejected' | 'more_info';
 export type RiskLevel = 'Low' | 'Moderate' | 'Elevated' | 'High';
+
+/**
+ * Plain-English snapshot of a borrower's everyday financial activity.
+ * These are the "alternative financial signals" an officer reviews — kept
+ * free of any ML / developer terminology so they read naturally to a human.
+ */
+export interface ApplicationSignals {
+  /** e.g. "About 32 wallet transactions a month" */
+  walletActivity: string;
+  /** e.g. "Pays utility bills on time 90% of the time" */
+  billPayments: string;
+  /** e.g. "Tops up phone credit regularly" */
+  mobileTopUps: string;
+  /** e.g. "Repaid 3 past loans on time" */
+  repayment: string;
+  /** Whether the applicant holds a bank account. */
+  hasBankAccount: boolean;
+}
 
 export interface LoanApplication {
   id: string;
@@ -18,6 +36,10 @@ export interface LoanApplication {
   recommendation?: string;
   confidenceScore?: number;
   defaultProbability?: number;
+  /** CNIC of the borrower who submitted this application (for the borrower's own status view). */
+  borrowerCnic?: string;
+  /** Plain-language summary of the applicant's everyday financial activity. */
+  signals?: ApplicationSignals;
 }
 
 /**
@@ -75,6 +97,7 @@ export function toRiskTier(level: RiskLevel): RiskTier {
 export function toApplicationStatus(status: LoanStatus): ApplicationStatus {
   if (status === 'approved') return 'approved';
   if (status === 'rejected') return 'rejected';
+  if (status === 'more_info') return 'more_info';
   return 'pending_review';
 }
 

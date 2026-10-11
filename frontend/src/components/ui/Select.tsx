@@ -39,13 +39,13 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           <div className="flex items-center justify-between">
             <label
               htmlFor={selectId}
-              className="text-xs font-semibold text-zinc-300 tracking-tight"
+              className="text-xs font-semibold text-slate-600 tracking-tight"
             >
               {label}
               {!optional && <span className="text-rose-500 ml-0.5">*</span>}
             </label>
             {optional && (
-              <span className="text-[11px] font-medium text-zinc-500">Optional</span>
+              <span className="text-[11px] font-medium text-slate-400">Optional</span>
             )}
           </div>
         )}
@@ -55,11 +55,11 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             ref={ref}
             className={cn(
-              'w-full text-xs sm:text-sm px-3.5 py-2.2 pr-9 rounded-lg bg-zinc-900 border transition-all duration-150 text-zinc-100 appearance-none cursor-pointer',
-              'focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600',
+              'w-full text-xs sm:text-sm px-3.5 py-2.5 pr-9 rounded-xl bg-white/90 border transition-all duration-150 text-[#0F172A] appearance-none cursor-pointer',
+              'focus:outline-none focus:ring-2 focus:ring-[#0072ff]/20 focus:border-[#0072ff]/50',
               error
-                ? 'border-rose-500/60 bg-rose-500/5 focus:border-rose-500 focus:ring-rose-500/20'
-                : 'border-zinc-800 hover:border-zinc-700',
+                ? 'border-rose-400 bg-rose-500/5 focus:border-rose-500 focus:ring-rose-500/20'
+                : 'border-white/80 hover:border-slate-300/70',
               className
             )}
             {...props}
@@ -75,13 +75,13 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3 pointer-events-none" />
+          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 pointer-events-none" />
         </div>
 
         {error ? (
-          <p className="text-[11px] font-medium text-rose-400 mt-1">{error}</p>
+          <p className="text-[11px] font-medium text-rose-600 mt-1">{error}</p>
         ) : helperText ? (
-          <p className="text-[11px] text-zinc-500 leading-normal mt-1">{helperText}</p>
+          <p className="text-[11px] text-[#475569] leading-normal mt-1">{helperText}</p>
         ) : null}
       </div>
     );
